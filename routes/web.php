@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
 
-Route::get('/dashboard', function () {
-    return view('index');
+// Redirect root URL (/) ke dashboard jika diperlukan
+Route::get('/', function () {
+    return redirect('/dashboard');  
 });
