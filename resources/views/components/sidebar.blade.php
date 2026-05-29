@@ -7,7 +7,7 @@
   <div class="px-3 pt-4 pb-1">
     <div class="text-[10px] font-bold text-white/30 uppercase tracking-widest px-2 mb-1">Utama</div>
     
-    <a href="{{ url('/') }}" class="sb-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-medium transition-all mb-0.5 {{ ($initPage ?? 'dashboard') === 'dashboard' ? 'bg-sg-blue text-white font-semibold' : 'text-white/55 hover:bg-white/[0.07] hover:text-white/85' }}">
+    <a href="{{ url('/dashboard') }}" class="sb-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-medium transition-all mb-0.5 {{ ($initPage ?? 'dashboard') === 'dashboard' ? 'bg-sg-blue text-white font-semibold' : 'text-white/55 hover:bg-white/[0.07] hover:text-white/85' }}">
       <i class="bi bi-grid-1x2-fill w-5 text-center text-base flex-shrink-0"></i> Dashboard
     </a>
     
@@ -51,7 +51,6 @@
 
   <div class="px-3 pt-4 pb-1">
     <div class="text-[10px] font-bold text-white/30 uppercase tracking-widest px-2 mb-1">Sistem</div>
-    
     <a href="{{ url('/pengaturan') }}" class="sb-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer text-sm font-medium transition-all mb-0.5 {{ ($initPage ?? '') === 'pengaturan' ? 'bg-sg-blue text-white font-semibold' : 'text-white/55 hover:bg-white/[0.07] hover:text-white/85' }}">
       <i class="bi bi-gear w-5 text-center text-base flex-shrink-0"></i> Pengaturan
     </a>

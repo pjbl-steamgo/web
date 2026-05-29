@@ -2,8 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Rute Halaman Utama (Dashboard)
+// Redirect dari root URL (/) ke /dashboard
 Route::get('/', function () {
+    return redirect('/dashboard');
+});
+
+// Rute Utama Dashboard
+Route::get('/dashboard', function () {
     return view('index', ['initPage' => 'dashboard']);
 })->name('dashboard');
 

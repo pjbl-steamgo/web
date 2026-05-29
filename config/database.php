@@ -116,7 +116,7 @@ return [
         'mongodb' => [
             'driver' => 'mongodb',
             // Kita gunakan format DSN sesuai dokumentasi, tapi diarahkan ke localhost
-            'dsn' => env('MONGODB_URI', 'mongodb://127.0.0.1:27017'),
+            'dsn' => env('DB_URI', 'mongodb://127.0.0.1:27017'),
             // Kita arahkan ke DB_DATABASE yang ada di .env, dengan fallback 'steamgo'
             'database' => env('DB_DATABASE', 'steamgo'), 
         ],
