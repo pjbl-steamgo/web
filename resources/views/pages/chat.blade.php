@@ -4,25 +4,45 @@
     /* Menyembunyikan scrollbar di menu balasan cepat agar rapi */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Responsif Mobile UX untuk Chat Split Screen */
+    @media (max-width: 1023px) {
+      .chat-container #chat-sidebar {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      .chat-container #chat-window {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      /* Jika chat sedang aktif/terbuka di mobile, sembunyikan daftar kontak */
+      .chat-container.chat-active #chat-sidebar {
+        display: none !important;
+      }
+      /* Jika chat TIDAK aktif/terbuka di mobile, sembunyikan jendela percakapan */
+      .chat-container:not(.chat-active) #chat-window {
+        display: none !important;
+      }
+    }
   </style>
 
-  <div class="bg-white rounded-2xl border border-sg-border shadow-sm flex flex-col lg:flex-row overflow-hidden" style="height:calc(100vh - 100px); min-height:600px;">
+  <div class="bg-white rounded-2xl border border-sg-border shadow-sm flex flex-col lg:flex-row overflow-hidden w-full chat-container" id="chat-container" style="height:calc(100vh - 110px);">
 
-    <div class="w-full lg:w-[320px] h-[40%] lg:h-full flex flex-col border-b lg:border-b-0 lg:border-r border-sg-border flex-shrink-0 bg-[#FAFBFD]">
+    <div class="w-full lg:w-[320px] h-full flex flex-col border-b lg:border-b-0 lg:border-r border-sg-border flex-shrink-0 bg-[#FAFBFD] min-h-0" id="chat-sidebar">
       
-      <div class="px-5 py-4 border-b border-sg-border flex items-center justify-between">
+      <div class="px-5 py-4 border-b border-sg-border flex items-center justify-between flex-shrink-0">
         <span class="font-display font-bold text-[15px]">💬 Pesan Masuk</span>
         <span class="inline-flex text-[11px] font-bold px-2.5 py-1 rounded-full bg-sg-bluelt text-sg-blue shadow-sm" id="unread-count">4 baru</span>
       </div>
       
-      <div class="p-3 border-b border-sg-border bg-white">
+      <div class="p-3 border-b border-sg-border bg-white flex-shrink-0">
         <div class="relative">
           <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-sg-sub text-sm"></i>
           <input type="text" class="w-full bg-sg-bg border border-sg-border rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-sg-blue focus:ring-1 focus:ring-sg-blue transition-all" placeholder="Cari pelanggan..." id="chat-search" oninput="filterContacts(this.value)">
         </div>
       </div>
       
-      <div class="flex-1 overflow-y-auto bg-white" id="chat-contacts">
+      <div class="flex-1 overflow-y-auto bg-white min-h-0" id="chat-contacts">
         
         <div class="chat-contact" onclick="openChat(this, 'Raditya H.', '10:42', 'R', 'bg-sg-blue')">
           <div class="cc-avatar bg-sg-blue">R</div>
@@ -54,14 +74,18 @@
       </div>
     </div>
 
-    <div class="flex-1 flex flex-col overflow-hidden relative bg-[#F7F9FD]" id="chat-window">
+    <div class="flex-1 flex flex-col overflow-hidden relative bg-[#F7F9FD] min-h-0" id="chat-window">
 
       <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-sg-sub bg-white z-10" id="chat-empty">
         <div class="text-6xl opacity-20 mb-2">💬</div>
         <div class="text-[14px] font-medium px-6 text-center">Pilih percakapan dari daftar untuk mulai membalas</div>
       </div>
 
-      <div class="px-4 md:px-5 py-3 md:py-4 border-b border-sg-border hidden items-center gap-3 bg-white shadow-sm z-20" id="cw-header">
+      <div class="px-4 md:px-5 py-3 md:py-4 border-b border-sg-border hidden items-center gap-3 bg-white shadow-sm z-20 flex-shrink-0" id="cw-header">
+        <button class="lg:hidden text-sg-text hover:text-sg-blue mr-1 flex items-center justify-center w-8 h-8 rounded-lg hover:bg-sg-bg transition-colors" onclick="closeChat()" title="Kembali ke daftar pesan">
+          <i class="bi bi-arrow-left text-lg"></i>
+        </button>
+
         <div class="w-10 md:w-11 h-10 md:h-11 rounded-xl bg-sg-blue flex items-center justify-center text-lg font-bold text-white flex-shrink-0 shadow-sm" id="cw-avatar"></div>
         <div class="flex-grow min-w-0">
           <div class="font-bold text-[14px] md:text-[15px] truncate text-sg-text" id="cw-name"></div>
@@ -79,10 +103,10 @@
         </div>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-4 md:p-6 flex-col gap-3 hidden z-20" id="chat-msgs">
-        </div>
+      <div class="flex-1 overflow-y-auto p-4 md:p-6 flex-col gap-3 hidden z-20 min-h-0" id="chat-msgs">
+      </div>
 
-      <div id="chat-input-section" class="hidden flex-col bg-white border-t border-sg-border z-20">
+      <div id="chat-input-section" class="hidden flex-col bg-white border-t border-sg-border z-20 flex-shrink-0">
         
         <div class="flex gap-2 p-3 pb-2 overflow-x-auto whitespace-nowrap hide-scrollbar border-b border-sg-border/50 bg-[#FAFBFD]">
           <button class="px-4 py-1.5 rounded-full text-[11px] font-bold bg-white text-sg-sub border border-sg-border hover:border-sg-blue hover:text-sg-blue transition-colors shadow-sm flex-shrink-0" onclick="quickReply('Baik kak, kami proses sekarang ya 😊')">Oke, diproses</button>
@@ -93,7 +117,7 @@
         
         <div class="p-3 md:p-4 flex items-end gap-2 md:gap-3">
           <div class="flex-1 bg-[#F8FAFC] border border-sg-border rounded-xl px-3 md:px-4 py-2 flex items-end gap-2 focus-within:border-sg-blue focus-within:bg-white focus-within:ring-1 focus-within:ring-sg-blue transition-all shadow-inner">
-            <textarea id="chat-textarea" class="chat-textarea flex-1 bg-transparent border-none text-[13px] md:text-sm text-sg-text placeholder-sg-sub py-1.5" placeholder="Ketik balasan untuk pelanggan..." rows="1"
+            <textarea id="chat-textarea" class="chat-textarea flex-1 bg-transparent border-none text-[13px] md:text-sm text-sg-text placeholder-sg-sub py-1.5 max-h-24 overflow-y-auto hide-scrollbar" placeholder="Ketik balasan untuk pelanggan..." rows="1"
               onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
               oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
             <button class="text-[20px] cursor-pointer text-sg-sub hover:text-sg-blue transition-colors pb-1 mr-1" title="Lampirkan File">
@@ -116,12 +140,12 @@
     // LOGIKA INTERAKSI HALAMAN CHAT
     // ==========================================
 
-    // 1. Fungsi untuk Membuka Chat saat kontak diklik
     function openChat(element, name, time, avatarText, avatarColor) {
-      // Sembunyikan layar kosong, tampilkan area chat
+      // 1. Tambahkan state aktif untuk kontrol responsif CSS mobile
+      document.getElementById('chat-container').classList.add('chat-active');
+
       document.getElementById('chat-empty').classList.add('hidden');
       
-      // Hapus hidden & tambahkan flex agar komponen tampil
       document.getElementById('cw-header').classList.remove('hidden');
       document.getElementById('cw-header').classList.add('flex');
       document.getElementById('chat-msgs').classList.remove('hidden');
@@ -129,22 +153,17 @@
       document.getElementById('chat-input-section').classList.remove('hidden');
       document.getElementById('chat-input-section').classList.add('flex');
 
-      // Update Header Chat
       document.getElementById('cw-name').textContent = name;
       let avatarEl = document.getElementById('cw-avatar');
       avatarEl.textContent = avatarText;
-      // Mengganti warna background avatar header sesuai kontak
       avatarEl.className = `w-10 md:w-11 h-10 md:h-11 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0 shadow-sm ${avatarColor}`;
 
-      // Hapus status 'active' dari semua kontak, lalu tambahkan ke kontak yg diklik
       document.querySelectorAll('.chat-contact').forEach(el => el.classList.remove('active'));
       element.classList.add('active');
 
-      // Hilangkan badge merah (unread) jika ada
       let unreadBadge = element.querySelector('.cc-unread');
       if(unreadBadge) unreadBadge.classList.add('hidden');
 
-      // Isi riwayat chat (Bisa disesuaikan nanti dengan data dari database)
       const chatMsgs = document.getElementById('chat-msgs');
       chatMsgs.innerHTML = `
         <div class="msg-date-divider"><span>Hari ini</span></div>
@@ -157,24 +176,25 @@
         </div>
       `;
 
-      // (Khusus Mobile) Otomatis scroll ke bawah agar area chat langsung terlihat
-      if (window.innerWidth < 1024) {
-        document.getElementById('chat-input-section').scrollIntoView({ behavior: 'smooth' });
-      }
+      // Otomatis gulir ke pesan paling bawah saat ruang chat terbuka
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
     }
 
-    // 2. Fungsi untuk Mengirim Pesan
+    // 2. Fungsi baru untuk menutup chat / kembali ke daftar kontak (khusus mobile)
+    function closeChat() {
+      document.getElementById('chat-container').classList.remove('chat-active');
+      document.querySelectorAll('.chat-contact').forEach(el => el.classList.remove('active'));
+    }
+
     function sendMsg(text = null) {
       const textarea = document.getElementById('chat-textarea');
-      // Jika fungsi dipanggil oleh tombol Quick Reply, gunakan teks tersebut. Jika tidak, ambil dari textarea
       const messageText = text !== null ? text : textarea.value.trim();
 
-      if (messageText === "") return; // Jangan kirim jika kosong
+      if (messageText === "") return;
 
       const chatMsgs = document.getElementById('chat-msgs');
       const currentTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
-      // Buat Gelembung Chat Admin (Warna Biru, Sebelah Kanan)
       const msgHTML = `
         <div class="msg-row admin" style="animation: fadeIn 0.3s ease;">
           <div class="msg-avatar bg-sg-blue">A</div>
@@ -185,18 +205,15 @@
         </div>
       `;
 
-      // Sisipkan gelembung chat ke dalam area percakapan
       chatMsgs.insertAdjacentHTML('beforeend', msgHTML);
 
-      // Kosongkan kolom input, reset tinggi textarea, dan scroll ke chat paling bawah
       textarea.value = "";
       textarea.style.height = 'auto';
       chatMsgs.scrollTop = chatMsgs.scrollHeight;
     }
 
-    // 3. Fungsi Balasan Cepat (Quick Reply)
     function quickReply(text) {
-      sendMsg(text); // Panggil fungsi sendMsg dengan teks yang dipilih
+      sendMsg(text);
     }
   </script>
 </div>

@@ -2,6 +2,7 @@
   <button id="hamburger" class="hidden p-0 mr-2 bg-transparent border-none" onclick="toggleSidebar()">
     <i class="bi bi-list text-2xl text-sg-text"></i>
   </button>
+  
   <div>
     <span class="font-display text-[17px] font-bold" id="topbar-title">
       @if(($initPage ?? 'dashboard') === 'antrian')
@@ -24,6 +25,7 @@
     </span>
     <span class="text-xs text-sg-sub ml-1" id="topbar-sub">Selamat datang, Admin!</span>
   </div>
+  
   <div class="ml-auto flex items-center gap-2">
     <div class="hidden md:flex items-center gap-2 bg-sg-bg border border-sg-border rounded-xl px-3.5 py-2 text-[13px] text-sg-sub cursor-pointer hover:border-sg-blue transition-colors" onclick="openTopbarSearch()">
       <i class="bi bi-search"></i> Cari pesanan...

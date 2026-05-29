@@ -78,13 +78,12 @@
         #sidebar.open { transform: translateX(0); }
         #main-content { margin-left: 0 !important; }
         #hamburger { display: flex !important; }
-        #sidebar-overlay.show { display: block; }
       }
     </style>
 </head>
 <body class="bg-sg-bg text-sg-text">
 
-    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-[1035]" onclick="closeSidebar()"></div>
+    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-[1035] transition-opacity" onclick="closeSidebar()"></div>
 
     @include('components.sidebar')
 
@@ -101,23 +100,65 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/crud.js') }}"></script>
     <script src="{{ asset('js/chat.js') }}"></script>
+    
     <script>
+    // =====================================
+    // FUNGSI UNTUK TOGGLE SIDEBAR DI MOBILE
+    // =====================================
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        // Tambahkan / Hapus class 'open' yang akan men-trigger animasi CSS translateX(0)
+        sidebar.classList.toggle('open');
+        
+        // Tampilkan / Sembunyikan latar belakang hitam (overlay) dan kunci scroll
+        if (sidebar.classList.contains('open')) {
+            overlay.classList.remove('hidden');
+            // Mencegah halaman utama bisa di-scroll
+            document.body.classList.add('overflow-hidden');
+        } else {
+            overlay.classList.add('hidden');
+            // Mengembalikan fungsi scroll halaman utama
+            document.body.classList.remove('overflow-hidden');
+        }
+    }
+
+    // Fungsi khusus untuk menutup saat area gelap di luar menu (overlay) di klik
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebar-overlay').classList.add('hidden');
+        // Mengembalikan fungsi scroll halaman utama
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    // =====================================
+    // FUNGSI MODAL DAN TOAST
+    // =====================================
     function openModal(id) {
       document.getElementById('modal-backdrop').classList.remove('hidden');
       document.getElementById(id).classList.remove('hidden');
     }
+    
     function closeModal() {
       document.getElementById('modal-backdrop').classList.add('hidden');
       document.querySelectorAll('.modal-panel').forEach(m => m.classList.add('hidden'));
     }
+    
     function showToast(msg) {
       const t = document.getElementById('sg-toast');
       document.getElementById('toast-msg').textContent = msg;
       t.classList.remove('hidden');
       t.style.opacity = '1';
-      setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.classList.add('hidden'), 300); }, 2800);
+      setTimeout(() => { 
+        t.style.opacity = '0'; 
+        setTimeout(() => t.classList.add('hidden'), 300); 
+      }, 2800);
     }
-    function toastMsg(msg) { showToast(msg); }
+    
+    function toastMsg(msg) { 
+      showToast(msg); 
+    }
     </script>
 </body>
 </html>
