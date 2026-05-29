@@ -83,7 +83,6 @@
           </tr>
         </thead>
         <tbody id="pelanggan-tbody" class="divide-y divide-sg-border">
-          
           <tr class="hover:bg-sg-bluelt/30 transition-colors border-b border-sg-border">
             <td class="px-5 py-4">
               <div class="font-bold text-[13.5px] text-sg-text">Faza Izzaturrafi</div>
@@ -108,32 +107,6 @@
               </div>
             </td>
           </tr>
-
-          <tr class="hover:bg-sg-bluelt/30 transition-colors border-b border-sg-border">
-            <td class="px-5 py-4">
-              <div class="font-bold text-[13.5px] text-sg-text">Mita</div>
-            </td>
-            <td class="px-5 py-4 text-[13.5px] text-sg-sub">0857-9876-5432</td>
-            <td class="px-5 py-4">
-              <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#F1F5F9] text-sg-sub border border-[#E2E7F0]">
-                Silver
-              </span>
-            </td>
-            <td class="px-5 py-4 text-[13.5px] font-bold text-sg-text">6x</td>
-            <td class="px-5 py-4 text-[13.5px] font-bold text-sg-text">Rp 240.000</td>
-            <td class="px-5 py-4 text-[13.5px] text-sg-sub">1 Minggu yang lalu</td>
-            <td class="px-5 py-4 text-center">
-              <div class="flex items-center justify-end md:justify-center gap-2">
-                <button class="w-7 h-7 rounded-lg bg-sg-bluelt text-sg-blue hover:bg-sg-blue hover:text-white transition-colors flex items-center justify-center shadow-sm" title="Lihat Profil" onclick="openModal('modal-detail-pelanggan')">
-                  <i class="bi bi-person-lines-fill text-xs"></i>
-                </button>
-                <button class="w-7 h-7 rounded-lg bg-sg-greenlt text-sg-green hover:bg-sg-green hover:text-white transition-colors flex items-center justify-center shadow-sm" title="Chat WhatsApp">
-                  <i class="bi bi-whatsapp text-xs"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-
         </tbody>
       </table>
     </div>
