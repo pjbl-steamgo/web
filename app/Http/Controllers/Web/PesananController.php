@@ -15,8 +15,11 @@ class PesananController extends Controller
      */
     public function index()
     {
-        // Mengambil semua riwayat pesanan (termasuk yang sudah Selesai & Batal)
-        $pesanans = Pesanan::with('layanan')->orderBy('tanggal', 'desc')->get();
+        // Mengambil riwayat pesanan, KECUALI yang masih tahap Booking atau Menunggu Pembayaran
+        $pesanans = Pesanan::with('layanan')
+            ->whereNotIn('status', ['Booking', 'Menunggu Pembayaran', 'Pending'])
+            ->orderBy('tanggal', 'desc')
+            ->get();
         
         return view('index', [
             'initPage' => 'pesanan',
@@ -87,9 +90,9 @@ class PesananController extends Controller
      * TAHAP 3: SELESAI DIKERJAKAN
      * (Kendaraan bersih -> Pindah ke Riwayat -> Kembalikan Slot -> Panggil antrian selanjutnya)
      */
-    public function selesai($id)
+    public function selesaikanPesanan($id)
     {
-        $pesanan = Pesanan::findOrFail($id);
+        $pesanan = \App\Models\Pesanan::findOrFail($id);
         
         // 1. Ubah status menjadi Selesai (Otomatis hilang dari papan antrian aktif)
         $pesanan->update(['status' => 'Selesai']);
@@ -101,7 +104,7 @@ class PesananController extends Controller
 
         // 3. ALGORITMA FIFO (First In First Out): 
         // Cari 1 orang yang sudah 'Antri' paling lama, lalu otomatis naikkan statusnya ke 'Proses'
-        $nextPesanan = Pesanan::where('status', 'Antri')
+        $nextPesanan = \App\Models\Pesanan::where('status', 'Antri')
             ->orderBy('tanggal', 'asc') // Urutkan dari waktu kedatangan paling awal
             ->first();
 
@@ -127,5 +130,33 @@ class PesananController extends Controller
         $pesanan->delete();
 
         return redirect()->back()->with('success', 'Data pesanan berhasil dihapus secara permanen.');
+    }
+
+    // Menampilkan UI khusus Konfirmasi Booking (Hanya yang berstatus 'Booking' atau 'Pending')
+    public function halamanBooking()
+    {
+        $pesanans = Pesanan::with('layanan')
+            ->whereIn('status', ['Booking', 'Pending'])
+            ->orderBy('tanggal', 'asc')
+            ->get();
+            
+        return view('index', [
+            'initPage' => 'konfirmasi-booking',
+            'pesanans' => $pesanans
+        ]);
+    }
+
+    // Menampilkan UI khusus Konfirmasi Pembayaran (Hanya yang berstatus 'Menunggu Pembayaran')
+    public function halamanPembayaran()
+    {
+        $pesanans = Pesanan::with('layanan')
+            ->where('status', 'Menunggu Pembayaran')
+            ->orderBy('tanggal', 'asc')
+            ->get();
+            
+        return view('index', [
+            'initPage' => 'konfirmasi-pembayaran',
+            'pesanans' => $pesanans
+        ]);
     }
 }

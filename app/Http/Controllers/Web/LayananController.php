@@ -7,6 +7,7 @@ use App\Models\Layanan;
 use App\Models\Pesanan;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule; // Wajib ditambahkan untuk validasi MongoDB
 
 class LayananController extends Controller
 {
@@ -29,19 +30,18 @@ class LayananController extends Controller
         ]);
     }
 
-    // Fungsi Tambah Data
-public function store(Request $request)
+    // 2. Fungsi Tambah Data
+    public function store(Request $request)
     {
-        // Validasi Unique pada nama_layanan
+        // Validasi Unique yang aman untuk MongoDB
         $request->validate([
-            'nama_layanan'   => 'required|string|max:255|unique:layanans,nama_layanan',
-            'kategori'       => 'required|string', 
-            'harga'          => 'required|numeric',
-            'estimasi_waktu' => 'required|numeric',
-            'slot_tersedia'  => 'required|numeric',
-            'deskripsi'      => 'required|string'
+            'nama_layanan'   => ['required', 'string', 'max:255', Rule::unique(Layanan::class, 'nama_layanan')],
+            'kategori'       => ['required', 'string'], 
+            'harga'          => ['required', 'numeric'],
+            'estimasi_waktu' => ['required', 'numeric'],
+            'slot_tersedia'  => ['required', 'numeric'],
+            'deskripsi'      => ['required', 'string']
         ], [
-            // Pesan error khusus jika nama sudah ada
             'nama_layanan.unique' => 'Gagal! Nama layanan ini sudah terdaftar di database.'
         ]);
 
@@ -58,17 +58,22 @@ public function store(Request $request)
         return redirect()->back()->with('success', 'Layanan berhasil ditambahkan!');
     }
 
-    // Fungsi Edit Data
+    // 3. Fungsi Edit Data
     public function update(Request $request, $id)
     {
-        // Pengecualian ID pada update agar tidak error saat di-save dengan nama yang sama
+        // Validasi Unique dengan Exception (Pengecualian) ID untuk MongoDB
         $request->validate([
-            'nama_layanan'   => 'required|string|max:255|unique:layanans,nama_layanan,' . $id . ',_id',
-            'kategori'       => 'required|string', 
-            'harga'          => 'required|numeric',
-            'estimasi_waktu' => 'required|numeric',
-            'slot_tersedia'  => 'required|numeric',
-            'deskripsi'      => 'required|string'
+            'nama_layanan'   => [
+                'required', 
+                'string', 
+                'max:255', 
+                Rule::unique(Layanan::class, 'nama_layanan')->ignore($id, '_id') // Ini cara benarnya di Laravel!
+            ],
+            'kategori'       => ['required', 'string'], 
+            'harga'          => ['required', 'numeric'],
+            'estimasi_waktu' => ['required', 'numeric'],
+            'slot_tersedia'  => ['required', 'numeric'],
+            'deskripsi'      => ['required', 'string']
         ], [
             'nama_layanan.unique' => 'Gagal! Nama layanan tersebut sudah digunakan oleh layanan lain.'
         ]);
@@ -104,7 +109,7 @@ public function store(Request $request)
         
         $layanan->update([
             'is_active' => !$currentState
-        ]);
+        ]); 
 
         return redirect()->back();
     }

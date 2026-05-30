@@ -11,8 +11,10 @@ class Pesanan extends Model
 
     protected $fillable = [
         'kode_pesanan',      // Cth: '#INV-001'
+        'user_id',
         'tanggal',           // Bisa pakai tipe Date/Timestamp
         'nama_pelanggan',    // Cth: 'Faza I.'
+        'no_hp',
         'layanan_id',        // Relasi ke tabel Layanan
         'kendaraan',         // Cth: 'NMAX'
         'metode_pembayaran', // Cth: 'Qris'

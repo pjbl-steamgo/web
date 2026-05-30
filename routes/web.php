@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\LayananController;
 use App\Http\Controllers\Web\PesananController;
 use App\Http\Controllers\Web\AntrianController;
+use App\Http\Controllers\Web\PelangganController;
 
 // Redirect dari root URL (/) ke /dashboard
 Route::get('/', function () {
@@ -21,8 +22,16 @@ Route::put('/antrian-jadwal/{id}/status', [AntrianController::class, 'updateStat
 
 // Rute Kelola Pesanan
 Route::get('/pesanan', [PesananController::class, 'index'])->name('pesanan');
+Route::delete('/pesanan/{id}', [PesananController::class, 'destroy'])->name('pesanan.destroy');
 // Rute khusus untuk menyelesaikan pesanan dengan logika FIFO
 Route::patch('/pesanan/{id}/selesai', [PesananController::class, 'selesaikanPesanan'])->name('pesanan.selesai');
+// Rute untuk transaksi pesanan
+Route::patch('/pesanan/{id}/konfirmasi-booking', [PesananController::class, 'konfirmasiBooking'])->name('pesanan.konfirmasiBooking');
+Route::patch('/pesanan/{id}/konfirmasi-pembayaran', [PesananController::class, 'konfirmasiPembayaran'])->name('pesanan.konfirmasiPembayaran');
+
+// Rute Tampilan Halaman (GET)
+Route::get('/konfirmasi-booking', [PesananController::class, 'halamanBooking'])->name('halaman.booking');
+Route::get('/konfirmasi-pembayaran', [PesananController::class, 'halamanPembayaran'])->name('halaman.pembayaran');
 
 // Rute Layanan & Harga
 Route::get('/layanan', [LayananController::class, 'index'])->name('layanan');
@@ -33,9 +42,8 @@ Route::delete('/layanan/{id}', [LayananController::class, 'destroy'])->name('lay
 Route::patch('/layanan/{id}/toggle', [LayananController::class, 'toggleStatus'])->name('layanan.toggle');
 
 // Rute Data Pelanggan
-Route::get('/pelanggan', function () {
-    return view('index', ['initPage' => 'pelanggan']);
-})->name('pelanggan');
+Route::get('/pelanggan', [PelangganController::class, 'index'])->name('pelanggan.index');
+Route::post('/pelanggan', [PelangganController::class, 'store'])->name('pelanggan.store');
 
 // Rute Laporan Pendapatan
 Route::get('/laporan', function () {

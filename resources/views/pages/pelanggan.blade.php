@@ -1,114 +1,147 @@
-<div class="page {{ ($initPage ?? '') === 'pelanggan' ? 'active' : '' }}" id="page-pelanggan">
+<div class="page {{ ($initPage ?? '') === 'pelanggan' ? 'active' : 'hidden' }}" id="page-pelanggan">
   
-  <style>
-    @media (max-width: 767px) {
-      #page-pelanggan table, #page-pelanggan thead, #page-pelanggan tbody, #page-pelanggan th, #page-pelanggan td, #page-pelanggan tr {
-        display: block !important;
-        width: 100% !important;
-        white-space: normal !important;
-      }
-      #page-pelanggan thead { display: none !important; }
-      
-      #page-pelanggan tbody tr {
-        margin-bottom: 16px;
-        border: 1px solid #E2E7F0;
-        border-radius: 12px;
-        padding: 4px 16px;
-        background: #fff;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      }
-      
-      #page-pelanggan tbody td {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 12px 0 !important;
-        border-bottom: 1px dashed #E2E7F0 !important;
-        text-align: right !important;
-        gap: 12px;
-      }
-      #page-pelanggan tbody td:last-child {
-        border-bottom: none !important;
-      }
-      
-      #page-pelanggan tbody td:before {
-        font-weight: 700;
-        font-size: 11px;
-        color: #64748B;
-        text-transform: uppercase;
-        text-align: left;
-        flex-shrink: 0;
-      }
-      
-      /* Mapping 7 Kolom Tabel Pelanggan */
-      #page-pelanggan tbody td:nth-child(1):before { content: "Pelanggan"; }
-      #page-pelanggan tbody td:nth-child(2):before { content: "Nomor HP"; }
-      #page-pelanggan tbody td:nth-child(3):before { content: "Member"; }
-      #page-pelanggan tbody td:nth-child(4):before { content: "Total Steam"; }
-      #page-pelanggan tbody td:nth-child(5):before { content: "Total Bayar"; }
-      #page-pelanggan tbody td:nth-child(6):before { content: "Terakhir Steam"; }
-      #page-pelanggan tbody td:nth-child(7):before { content: "Aksi"; }
-    }
-  </style>
-
-  <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 mb-6">
-    <div class="flex-1 w-full">
-      <input class="w-full bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue focus:ring-1 focus:ring-sg-blue transition-all shadow-sm" placeholder="🔍 Cari nama / nomor HP..." oninput="searchPelanggan(this.value)">
-    </div>
-    
-    <select class="bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue focus:ring-1 focus:ring-sg-blue transition-all shadow-sm w-full md:w-auto" onchange="filterPelangganMember(this.value)">
-      <option>Semua Member</option>
-      <option>Silver</option>
-      <option>Gold</option>
-      <option>Baru</option>
-    </select>
-    
-    <button class="w-full md:w-auto bg-sg-blue text-white font-semibold rounded-xl px-5 py-2.5 text-sm hover:bg-sg-bluedk transition-all shadow-sm flex items-center justify-center" onclick="openModal('modal-tambah-pelanggan')">
-      <i class="bi bi-plus-lg mr-2"></i> Tambah Pelanggan
-    </button>
+  <div class="mb-6">
+    <h2 class="text-xl font-display font-bold text-sg-text">Manajemen Akun Pelanggan</h2>
+    <p class="text-sm text-sg-sub mt-1">Simulator pembuatan akun user (mobile) serta daftar tingkatan member pelanggan.</p>
   </div>
 
-  <div class="bg-transparent md:bg-white md:rounded-2xl md:border md:border-sg-border md:shadow-sm overflow-hidden flex flex-col">
-    <div class="overflow-x-auto p-1 md:p-0">
-      <table class="w-full text-left whitespace-normal md:whitespace-nowrap min-w-full md:min-w-[900px]">
-        <thead class="bg-[#FAFBFD]">
-          <tr>
-            <th class="text-[11px] font-bold text-sg-sub uppercase tracking-wide border-b border-sg-border px-5 py-4">Pelanggan</th>
-            <th class="text-[11px] font-bold text-sg-sub uppercase tracking-wide border-b border-sg-border px-5 py-4">Nomor HP</th>
-            <th class="text-[11px] font-bold text-sg-sub uppercase tracking-wide border-b border-sg-border px-5 py-4">Member</th>
-            <th class="text-[11px] font-bold text-sg-sub uppercase tracking-wide border-b border-sg-border px-5 py-4">Total Steam</th>
-            <th class="text-[11px] font-bold text-sg-sub uppercase tracking-wide border-b border-sg-border px-5 py-4">Total Bayar</th>
-            <th class="text-[11px] font-bold text-sg-sub uppercase tracking-wide border-b border-sg-border px-5 py-4">Terakhir Steam</th>
-            <th class="text-[11px] font-bold text-sg-sub uppercase tracking-wide border-b border-sg-border px-5 py-4 text-center">Aksi</th>
-          </tr>
-        </thead>
-        <tbody id="pelanggan-tbody" class="divide-y divide-sg-border">
-          <tr class="hover:bg-sg-bluelt/30 transition-colors border-b border-sg-border">
-            <td class="px-5 py-4">
-              <div class="font-bold text-[13.5px] text-sg-text">Faza Izzaturrafi</div>
-            </td>
-            <td class="px-5 py-4 text-[13.5px] text-sg-sub">0812-3456-7890</td>
-            <td class="px-5 py-4">
-              <span class="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full bg-sg-yellowlt text-sg-yellow border border-sg-yellow/20">
-                <i class="bi bi-star-fill text-[10px]"></i> Gold
-              </span>
-            </td>
-            <td class="px-5 py-4 text-[13.5px] font-bold text-sg-text">15x</td>
-            <td class="px-5 py-4 text-[13.5px] font-bold text-sg-text">Rp 750.000</td>
-            <td class="px-5 py-4 text-[13.5px] text-sg-sub">2 Hari yang lalu</td>
-            <td class="px-5 py-4 text-center">
-              <div class="flex items-center justify-end md:justify-center gap-2">
-                <button class="w-7 h-7 rounded-lg bg-sg-bluelt text-sg-blue hover:bg-sg-blue hover:text-white transition-colors flex items-center justify-center shadow-sm" title="Lihat Profil" onclick="openModal('modal-detail-pelanggan')">
-                  <i class="bi bi-person-lines-fill text-xs"></i>
-                </button>
-                <button class="w-7 h-7 rounded-lg bg-sg-greenlt text-sg-green hover:bg-sg-green hover:text-white transition-colors flex items-center justify-center shadow-sm" title="Chat WhatsApp">
-                  <i class="bi bi-whatsapp text-xs"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  @if(session('success'))
+    <div class="mb-5 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm">
+      <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
     </div>
+  @endif
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <div class="bg-white border border-sg-border rounded-2xl shadow-sm p-5 h-fit">
+      <h3 class="text-sm font-bold text-sg-text uppercase tracking-wider mb-4 pb-2 border-b border-sg-border flex items-center gap-2">
+        <i class="bi bi-person-plus text-base text-sg-blue"></i> Buat Akun Baru
+      </h3>
+
+      <form action="{{ route('pelanggan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+        @csrf
+        
+        <div>
+          <label class="block text-[11px] font-bold text-sg-sub uppercase tracking-wider mb-1.5">ID User</label>
+          <input type="text" class="w-full bg-gray-50 border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-sub cursor-not-allowed font-mono" value="[ Otomatis Tergenerate Sistem ]" disabled>
+        </div>
+
+        <div>
+          <label for="username" class="block text-[11px] font-bold text-sg-sub uppercase tracking-wider mb-1.5">Username <span class="text-red-500">*</span></label>
+          <input type="text" name="username" id="username" required placeholder="Contoh: fazanew" value="{{ old('username') }}" class="w-full bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue transition-colors">
+          @error('username') <span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+          <label for="no_hp" class="block text-[11px] font-bold text-sg-sub uppercase tracking-wider mb-1.5">No. Handphone <span class="text-red-500">*</span></label>
+          <input type="tel" name="no_hp" id="no_hp" required placeholder="Contoh: 08123456789" value="{{ old('no_hp') }}" class="w-full bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue transition-colors">
+          @error('no_hp') <span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+          <label for="email" class="block text-[11px] font-bold text-sg-sub uppercase tracking-wider mb-1.5">Alamat Email <span class="text-red-500">*</span></label>
+          <input type="email" name="email" id="email" required placeholder="name@example.com" value="{{ old('email') }}" class="w-full bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue transition-colors">
+          @error('email') <span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+          <label for="password" class="block text-[11px] font-bold text-sg-sub uppercase tracking-wider mb-1.5">Password <span class="text-red-500">*</span></label>
+          <input type="password" name="password" id="password" required placeholder="Minimal 6 karakter" class="w-full bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue transition-colors">
+          @error('password') <span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span> @enderror
+        </div>
+
+        <div>
+          <label for="foto_profil" class="block text-[11px] font-bold text-sg-sub uppercase tracking-wider mb-1.5">Foto Profil</label>
+          <input type="file" name="foto_profil" id="foto_profil" accept="image/*" class="w-full text-sm text-sg-sub file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-sg-blue hover:file:bg-blue-100 border border-sg-border rounded-xl p-1.5 bg-white">
+          @error('foto_profil') <span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span> @enderror
+        </div>
+
+        <div class="bg-blue-50/50 border border-blue-100 p-3 rounded-xl text-xs text-sg-sub">
+          <i class="bi bi-info-circle text-sg-blue"></i> Akun baru otomatis berstatus member <strong class="text-sg-blue">Silver</strong> (0 total pesanan).
+        </div>
+
+        <button type="submit" class="w-full bg-sg-blue hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors shadow-sm flex items-center justify-center gap-2">
+          <i class="bi bi-cloud-upload"></i> Daftarkan User Baru
+        </button>
+      </form>
+    </div>
+
+    <div class="bg-white border border-sg-border rounded-2xl shadow-sm p-5 lg:col-span-2 overflow-hidden flex flex-col">
+      <h3 class="text-sm font-bold text-sg-text uppercase tracking-wider mb-4 pb-2 border-b border-sg-border flex items-center gap-2">
+        <i class="bi bi-people text-base text-sg-blue"></i> Database Akun Terdaftar
+      </h3>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="text-[11px] font-bold text-sg-sub uppercase tracking-wider border-b border-sg-border bg-[#FAFBFD]">
+              <th class="px-4 py-3">User</th>
+              <th class="px-4 py-3">Kontak & Email</th>
+              <th class="px-4 py-3 text-center">Total Order</th>
+              <th class="px-4 py-3 text-right">Tier Member</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-sg-border">
+            @forelse ($pelanggans ?? [] as $pelanggan)
+              @php
+                // Proteksi nilai pesanan jika kosong di mongo
+                $totalPesanan = $pelanggan->jumlah_pesanan ?? 0;
+                
+                // Menghitung & memvalidasi tingkatan tier member secara dinamis
+                if ($totalPesanan >= 40) {
+                    $tier = 'Diamond';
+                    $badgeStyle = 'bg-cyan-50 text-cyan-600 border-cyan-200';
+                } elseif ($totalPesanan >= 10 && $totalPesanan <= 39) {
+                    $tier = 'Gold';
+                    $badgeStyle = 'bg-amber-50 text-amber-600 border-amber-200';
+                } else {
+                    $tier = 'Silver';
+                    $badgeStyle = 'bg-slate-100 text-slate-600 border-slate-200';
+                }
+              @endphp
+              <tr class="hover:bg-gray-50 transition-colors text-sm">
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    @if(!empty($pelanggan->foto_profil))
+                      <img src="{{ asset('storage/' . $pelanggan->foto_profil) }}" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-sg-border">
+                    @else
+                      <div class="w-9 h-9 rounded-full bg-blue-100 text-sg-blue flex items-center justify-center font-bold text-sm uppercase">
+                        {{ substr($pelanggan->username, 0, 2) }}
+                      </div>
+                    @endif
+                    <div>
+                      <div class="font-bold text-sg-text">{{ $pelanggan->username }}</div>
+                      <div class="text-[11px] font-mono text-sg-sub mt-0.5">{{ $pelanggan->user_id }}</div>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <div class="text-sg-text font-medium">{{ $pelanggan->no_hp }}</div>
+                  <div class="text-[12px] text-sg-sub mt-0.5">{{ $pelanggan->email }}</div>
+                </td>
+
+                <td class="px-4 py-3 whitespace-nowrap text-center font-bold text-sg-text">
+                  {{ $totalPesanan }} <span class="text-xs font-normal text-sg-sub">kali</span>
+                </td>
+
+                <td class="px-4 py-3 whitespace-nowrap text-right">
+                  <span class="inline-flex px-2.5 py-1 rounded-full text-[11px] font-black uppercase border tracking-wider {{ $badgeStyle }}">
+                    <i class="bi bi-gem mr-1"></i> {{ $tier }}
+                  </span>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="4" class="px-4 py-10 text-center text-sg-sub text-xs">
+                  Belum ada data pelanggan yang terdaftar.
+                </td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
-</div>  
+</div>

@@ -6,6 +6,8 @@
     @include('pages.dashboard')
     @include('pages.antrian')
     @include('pages.pesanan')
+    @include('pages.konfirmasi-booking')
+    @include('pages.konfirmasi-pembayaran')
     @include('pages.layanan')
     @include('pages.pelanggan')
     @include('pages.laporan')
