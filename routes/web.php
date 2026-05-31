@@ -5,6 +5,7 @@ use App\Http\Controllers\Web\LayananController;
 use App\Http\Controllers\Web\PesananController;
 use App\Http\Controllers\Web\AntrianController;
 use App\Http\Controllers\Web\PelangganController;
+use App\Http\Controllers\Web\OrderAdminController;
 
 // Redirect dari root URL (/) ke /dashboard
 Route::get('/', function () {
@@ -26,8 +27,8 @@ Route::delete('/pesanan/{id}', [PesananController::class, 'destroy'])->name('pes
 // Rute khusus untuk menyelesaikan pesanan dengan logika FIFO
 Route::patch('/pesanan/{id}/selesai', [PesananController::class, 'selesaikanPesanan'])->name('pesanan.selesai');
 // Rute untuk transaksi pesanan
-Route::patch('/pesanan/{id}/konfirmasi-booking', [PesananController::class, 'konfirmasiBooking'])->name('pesanan.konfirmasiBooking');
-Route::patch('/pesanan/{id}/konfirmasi-pembayaran', [PesananController::class, 'konfirmasiPembayaran'])->name('pesanan.konfirmasiPembayaran');
+Route::post('/pesanan/{id}/konfirmasi-booking', [PesananController::class, 'konfirmasiBooking'])->name('pesanan.konfirmasiBooking');
+Route::post('/pesanan/{id}/konfirmasi-pembayaran', [PesananController::class, 'konfirmasiPembayaran'])->name('pesanan.konfirmasiPembayaran');
 
 // Rute Tampilan Halaman (GET)
 Route::get('/konfirmasi-booking', [PesananController::class, 'halamanBooking'])->name('halaman.booking');
@@ -39,7 +40,8 @@ Route::get('/layanan', [LayananController::class, 'index'])->name('layanan');
 Route::post('/layanan', [LayananController::class, 'store'])->name('layanan.store');
 Route::put('/layanan/{id}', [LayananController::class, 'update'])->name('layanan.update');
 Route::delete('/layanan/{id}', [LayananController::class, 'destroy'])->name('layanan.destroy');
-Route::patch('/layanan/{id}/toggle', [LayananController::class, 'toggleStatus'])->name('layanan.toggle');
+Route::post('/layanan/{id}/toggle', [LayananController::class, 'toggleStatus'])->name('layanan.toggle');
+Route::post('/layanan/update-status/{id}', [LayananController::class, 'updateStatus'])->name('layanan.updateStatus');
 
 // Rute Data Pelanggan
 Route::get('/pelanggan', [PelangganController::class, 'index'])->name('pelanggan.index');

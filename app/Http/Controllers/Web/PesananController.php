@@ -3,160 +3,136 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Pesanan;
-use App\Models\Layanan;
-use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class PesananController extends Controller
 {
     /**
-     * TAMPILKAN SEMUA DATA PESANAN (RIWAYAT)
+     * MENAMPILKAN SEMUA DATA PESANAN (HALAMAN UTAMA PESANAN)
      */
     public function index()
     {
-        // Mengambil riwayat pesanan, KECUALI yang masih tahap Booking atau Menunggu Pembayaran
-        $pesanans = Pesanan::with('layanan')
-            ->whereNotIn('status', ['Booking', 'Menunggu Pembayaran', 'Pending'])
-            ->orderBy('tanggal', 'desc')
-            ->get();
+        $pesanans = Pesanan::with('layanan')->orderBy('created_at', 'desc')->get();
         
         return view('index', [
-            'initPage' => 'pesanan',
+            'initPage' => 'pesanan', // Pastikan nama ini sesuai dengan di file index.blade.php
             'pesanans' => $pesanans
         ]);
     }
 
     /**
-     * TAHAP 1: KONFIRMASI BOOKING MASUK
-     * (Pesanan diterima, namun pelanggan belum membayar. Slot BELUM dikurangi)
+     * MENAMPILKAN HALAMAN KONFIRMASI BOOKING (Hanya status Belum Dikonfirmasi)
+     */
+    public function halamanBooking()
+    {
+        $pesanans = Pesanan::with('layanan')
+            ->where('status', 'Belum Dikonfirmasi')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return view('index', [
+            'initPage' => 'konfirmasi-booking', // KUNCI PEMISAH: Hanya memanggil komponen booking
+            'pesanans' => $pesanans
+        ]);
+    }
+
+    /**
+     * MENAMPILKAN HALAMAN KONFIRMASI PEMBAYARAN (Hanya status Sedang Diverifikasi)
+     */
+    public function halamanPembayaran()
+    {
+        $pesanans = Pesanan::with('layanan')
+            ->where('status', 'Sedang Diverifikasi')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        return view('index', [
+            'initPage' => 'konfirmasi-pembayaran', // KUNCI PEMISAH: Hanya memanggil komponen pembayaran
+            'pesanans' => $pesanans
+        ]);
+    }
+
+    /**
+     * AKSI ADMIN: Menyetujui Booking Masuk
      */
     public function konfirmasiBooking($id)
     {
         $pesanan = Pesanan::findOrFail($id);
         
-        // Ubah status agar pelanggan tahu booking di-acc dan bisa lanjut bayar
-        $pesanan->update(['status' => 'Menunggu Pembayaran']);
-
-        return redirect()->back()->with('success', 'Booking dikonfirmasi! Menunggu pelanggan melakukan pembayaran.');
+        if ($pesanan->status === 'Belum Dikonfirmasi') {
+            $pesanan->update(['status' => 'Belum Bayar']);
+            return redirect()->back()->with('success', 'Booking berhasil disetujui! Pengguna kini bisa melakukan pembayaran.');
+        }
+        
+        return redirect()->back()->with('error', 'Gagal, status pesanan tidak valid.');
     }
 
     /**
-     * TAHAP 2: KONFIRMASI PEMBAYARAN (INTI SISTEM / RACE CONDITION)
-     * (Uang masuk -> Slot dipotong -> Masuk antrian -> Batalkan yang lain jika penuh)
+     * AKSI ADMIN: Memverifikasi Bukti Pembayaran & Masuk Antrean
      */
     public function konfirmasiPembayaran($id)
     {
         $pesanan = Pesanan::findOrFail($id);
-        $layanan = $pesanan->layanan;
 
-        if (!$layanan) {
-            return redirect()->back()->with('error', 'Layanan tidak ditemukan pada sistem.');
+        if ($pesanan->status === 'Sedang Diverifikasi') {
+            // Algoritma Cek Antrean Berjalan
+            $antreanAktif = Pesanan::where('tanggal', $pesanan->tanggal)
+                ->where('layanan_id', $pesanan->layanan_id)
+                ->where('status', 'Proses')
+                ->count();
+
+            // Jika sudah ada yang diproses, masukkan ke Antri. Jika kosong, langsung Proses.
+            $statusBaru = $antreanAktif > 0 ? 'Antri' : 'Proses';
+            
+            $pesanan->update(['status' => $statusBaru]);
+            
+            return redirect()->back()->with('success', "Pembayaran diverifikasi! Pesanan otomatis masuk ke status: {$statusBaru}.");
         }
 
-        // 1. Validasi Keamanan: Pastikan slot benar-benar masih tersedia
-        if ($layanan->slot_tersedia <= 0) {
-            return redirect()->back()->with('error', 'Gagal! Slot layanan ini baru saja habis dipesan pelanggan lain.');
-        }
-
-        // 2. Transaksi Aman! Potong kapasitas slot layanan
-        $layanan->decrement('slot_tersedia');
-
-        // 3. Logika Antrian Cerdas:
-        // Cek apakah ada kendaraan lain yang sedang dicuci (Proses).
-        // Jika kosong, langsung eksekusi (Proses). Jika ada yang dicuci, suruh tunggu (Antri).
-        $isAdaYangProses = Pesanan::where('status', 'Proses')->exists();
-        
-        if (!$isAdaYangProses) {
-            $pesanan->update(['status' => 'Proses']);
-        } else {
-            $pesanan->update(['status' => 'Antri']);
-        }
-
-        // 4. LOGIKA SAPU BERSIH (RACE CONDITION PREVENTION)
-        // Cek data terbaru slot di database. Jika ternyata ini adalah slot terakhir (0),
-        // maka hancurkan/batalkan semua booking lain yang iseng menahan tempat (belum bayar).
-        if ($layanan->fresh()->slot_tersedia == 0) {
-            Pesanan::where('layanan_id', $layanan->id)
-                ->whereIn('status', ['Booking', 'Menunggu Pembayaran', 'Pending'])
-                ->where('_id', '!=', $pesanan->id) // Kecualikan pesanan si pemenang ini
-                ->update(['status' => 'Batal Otomatis']);
-        }
-
-        return redirect()->back()->with('success', 'Pembayaran berhasil dikonfirmasi! Kendaraan telah masuk ke antrian aktif.');
+        return redirect()->back()->with('error', 'Gagal memverifikasi pembayaran.');
     }
 
     /**
-     * TAHAP 3: SELESAI DIKERJAKAN
-     * (Kendaraan bersih -> Pindah ke Riwayat -> Kembalikan Slot -> Panggil antrian selanjutnya)
+     * AKSI ADMIN: Menyelesaikan Pesanan
      */
     public function selesaikanPesanan($id)
     {
-        $pesanan = \App\Models\Pesanan::findOrFail($id);
+        $pesanan = Pesanan::findOrFail($id);
         
-        // 1. Ubah status menjadi Selesai (Otomatis hilang dari papan antrian aktif)
+        // Simpan info penting sebelum mengubah
+        $tanggalLayanan = $pesanan->tanggal;
+        $idLayanan = $pesanan->layanan_id;
+        $statusLama = $pesanan->status;
+
+        // Ubah jadi selesai
         $pesanan->update(['status' => 'Selesai']);
 
-        // 2. Kembalikan 1 slot ke layanan tersebut agar bisa dipesan pelanggan baru
-        if ($pesanan->layanan) {
-            $pesanan->layanan->increment('slot_tersedia');
+        // LOGIKA SHIFTING: Jika yang diselesaikan adalah pesanan yang sedang diproses
+        if ($statusLama === 'Proses') {
+            $antreanBerikutnya = Pesanan::where('tanggal', $tanggalLayanan)
+                ->where('layanan_id', $idLayanan)
+                ->where('status', 'Antri')
+                ->orderBy('created_at', 'asc')
+                ->first();
+
+            if ($antreanBerikutnya) {
+                $antreanBerikutnya->update(['status' => 'Proses']);
+                return redirect()->back()->with('success', 'Pesanan telah berhasil diselesaikan! Antrean berikutnya otomatis diproses.');
+            }
         }
 
-        // 3. ALGORITMA FIFO (First In First Out): 
-        // Cari 1 orang yang sudah 'Antri' paling lama, lalu otomatis naikkan statusnya ke 'Proses'
-        $nextPesanan = \App\Models\Pesanan::where('status', 'Antri')
-            ->orderBy('tanggal', 'asc') // Urutkan dari waktu kedatangan paling awal
-            ->first();
-
-        if ($nextPesanan) {
-            $nextPesanan->update(['status' => 'Proses']);
-        }
-
-        return redirect()->back()->with('success', 'Pengerjaan selesai! 1 Slot dikembalikan dan kendaraan berikutnya otomatis diproses.');
+        return redirect()->back()->with('success', 'Pesanan telah berhasil diselesaikan!');
     }
 
     /**
-     * HAPUS DATA PESANAN
+     * AKSI ADMIN: Menghapus Pesanan
      */
     public function destroy($id)
     {
         $pesanan = Pesanan::findOrFail($id);
-        
-        // Jika yang dihapus ternyata sedang antri/proses, kembalikan dulu slotnya biar tidak nyangkut
-        if (in_array($pesanan->status, ['Proses', 'Antri']) && $pesanan->layanan) {
-            $pesanan->layanan->increment('slot_tersedia');
-        }
-
         $pesanan->delete();
 
         return redirect()->back()->with('success', 'Data pesanan berhasil dihapus secara permanen.');
-    }
-
-    // Menampilkan UI khusus Konfirmasi Booking (Hanya yang berstatus 'Booking' atau 'Pending')
-    public function halamanBooking()
-    {
-        $pesanans = Pesanan::with('layanan')
-            ->whereIn('status', ['Booking', 'Pending'])
-            ->orderBy('tanggal', 'asc')
-            ->get();
-            
-        return view('index', [
-            'initPage' => 'konfirmasi-booking',
-            'pesanans' => $pesanans
-        ]);
-    }
-
-    // Menampilkan UI khusus Konfirmasi Pembayaran (Hanya yang berstatus 'Menunggu Pembayaran')
-    public function halamanPembayaran()
-    {
-        $pesanans = Pesanan::with('layanan')
-            ->where('status', 'Menunggu Pembayaran')
-            ->orderBy('tanggal', 'asc')
-            ->get();
-            
-        return view('index', [
-            'initPage' => 'konfirmasi-pembayaran',
-            'pesanans' => $pesanans
-        ]);
     }
 }

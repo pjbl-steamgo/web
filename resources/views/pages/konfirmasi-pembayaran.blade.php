@@ -1,138 +1,121 @@
-<div class="page {{ ($initPage ?? '') === 'konfirmasi-pembayaran' ? 'active' : 'hidden' }}" id="page-konfirmasi-pembayaran">
-  
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-    <div>
-      <h2 class="text-xl font-display font-bold text-sg-text">Konfirmasi Pembayaran</h2>
-      <p class="text-sm text-sg-sub mt-1">Periksa bukti transfer pelanggan dan validasi pembayaran untuk masuk ke antrian cuci.</p>
-    </div>
-    
-    <select id="sort-pembayaran" onchange="sortCards('grid-pembayaran', this.value)" class="bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm font-bold text-sg-text focus:outline-none focus:border-sg-blue shadow-sm cursor-pointer w-full sm:w-auto">
-      <option value="asc">Urutkan: Terlama (Prioritas)</option>
-      <option value="desc">Urutkan: Terbaru Masuk</option>
-    </select>
-  </div>
-
-  @if(session('success'))
-    <div class="mb-5 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm">
-      <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
-    </div>
-  @endif
-
-  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6" id="grid-pembayaran">
-    @forelse ($pesanans ?? [] as $pesanan)
-      
-      <div class="sortable-card bg-white border border-purple-200 rounded-2xl shadow-sm p-6 relative overflow-hidden flex flex-col" data-time="{{ \Carbon\Carbon::parse($pesanan->tanggal)->timestamp }}">
-        <div class="absolute top-0 right-0 bg-purple-50 text-purple-600 text-[10px] font-bold px-4 py-1.5 rounded-bl-xl border-b border-l border-purple-200">BUTUH VALIDASI</div>
+<div class="w-full">
+    <div class="mb-6 flex justify-between items-end">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900">Konfirmasi Pembayaran</h2>
+            <p class="text-gray-500 text-sm mt-1">Periksa bukti transfer pelanggan dan validasi pembayaran untuk masuk ke antrean cuci.</p>
+        </div>
         
-        <div class="flex items-start gap-4 mb-5">
-          <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xl font-bold flex-shrink-0">
-            {{ strtoupper(substr($pesanan->nama_pelanggan, 0, 1)) }}
-          </div>
-          <div>
-            <h3 class="font-bold text-[18px] text-sg-text">{{ $pesanan->nama_pelanggan }}</h3>
-            <div class="text-[13px] font-mono text-sg-sub mt-0.5"><span class="font-bold text-sg-text">Kode Pesanan:</span> {{ $pesanan->kode_pesanan }}</div>
-          </div>
+        <div class="hidden md:flex items-center bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-sm cursor-pointer hover:bg-gray-50">
+            <span class="text-sm font-bold text-gray-800">Urutkan: Terlama (Prioritas)</span>
+            <svg class="w-4 h-4 ml-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </div>
+    </div>
 
-        <div class="grid grid-cols-2 gap-x-4 gap-y-3.5 bg-[#FAFBFD] p-5 rounded-xl border border-sg-border/70 flex-grow mb-4">
-          
-          <div>
-            <div class="text-[10px] text-sg-sub uppercase font-bold tracking-wider mb-0.5">ID User</div>
-            <div class="text-[13px] font-bold text-sg-text">{{ $pesanan->user_id ?? '-' }}</div>
-          </div>
-          
-          <div>
-            <div class="text-[10px] text-sg-sub uppercase font-bold tracking-wider mb-0.5">No. Handphone</div>
-            <div class="text-[13px] font-bold text-sg-text">{{ $pesanan->no_hp ?? '-' }}</div>
-          </div>
-          
-          <div class="col-span-2 border-t border-sg-border/50 my-0.5"></div>
-          
-          <div>
-            <div class="text-[10px] text-sg-sub uppercase font-bold tracking-wider mb-0.5">Layanan Dipilih</div>
-            <div class="text-[13px] font-bold text-sg-text">{{ $pesanan->layanan->nama_layanan ?? '-' }}</div>
-          </div>
-          <div>
-            <div class="text-[10px] text-sg-sub uppercase font-bold tracking-wider mb-0.5">Kategori</div>
-            <div class="text-[13px] font-bold text-sg-text">{{ $pesanan->layanan->kategori ?? '-' }}</div>
-          </div>
-          
-          <div>
-            <div class="text-[10px] text-sg-sub uppercase font-bold tracking-wider mb-0.5">Kendaraan</div>
-            <div class="text-[13px] font-bold text-sg-text">{{ $pesanan->kendaraan ?? '-' }}</div>
-          </div>
-          <div>
-            <div class="text-[10px] text-sg-sub uppercase font-bold tracking-wider mb-0.5">Waktu Booking</div>
-            <div class="text-[13px] font-bold text-sg-text">{{ \Carbon\Carbon::parse($pesanan->tanggal)->format('d M Y, H:i') }}</div>
-          </div>
+    @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline">{{ session('error') }}</span>
+        </div>
+    @endif
 
-          <div class="col-span-2 border-t border-sg-border/50 my-0.5"></div>
-          
-          <div>
-            <div class="text-[10px] text-sg-sub uppercase font-bold tracking-wider mb-0.5">Metode Pembayaran</div>
-            <div class="text-[13px] font-bold text-sg-text uppercase">{{ $pesanan->metode_pembayaran ?? '-' }}</div>
-          </div>
-          <div>
-            <div class="text-[10px] text-sg-sub uppercase font-bold tracking-wider mb-0.5">Status Pembayaran</div>
-            <div class="text-[13px] font-bold text-purple-600 uppercase flex items-center gap-1">
-              <i class="bi bi-hourglass-split"></i> {{ $pesanan->status ?? 'Menunggu Pembayaran' }}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        @forelse ($pesanans as $pesanan)
+            <div class="bg-white rounded-[20px] border border-gray-100 shadow-sm relative overflow-hidden flex flex-col h-full">
+                
+                <div class="absolute top-0 right-0 bg-[#E0E7FF] text-[#3B5BDB] text-[10px] font-bold px-4 py-1.5 rounded-bl-xl">
+                    MENUNGGU VERIFIKASI
+                </div>
+
+                <div class="p-6 md:p-8 flex flex-col flex-grow">
+                    <div class="flex items-center space-x-4 mb-8">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-[#3B5BDB] font-bold text-xl flex-shrink-0">
+                            {{ strtoupper(substr($pesanan->nama_pelanggan ?? 'U', 0, 1)) }}
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-800">
+                                Kode Pesanan : <span class="font-bold text-black">{{ $pesanan->kode_pesanan ?? '-' }}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-y-6 gap-x-4 mb-8">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">ID User / Nama</p>
+                            <p class="text-sm font-bold text-gray-900 truncate">{{ $pesanan->nama_pelanggan ?? $pesanan->user_id ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">No. Handphone</p>
+                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->no_hp ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Layanan Dipilih</p>
+                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->layanan->nama_layanan ?? 'Steam Wash' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Kategori</p>
+                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->layanan->kategori ?? 'Motor' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Kendaraan</p>
+                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->kendaraan ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Waktu Booking</p>
+                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->tanggal ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Metode Pembayaran</p>
+                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->metode_pembayaran ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Harga Layanan</p>
+                            <p class="text-sm font-bold text-gray-900">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6 bg-[#FFF9E6] border border-[#FDE68A] rounded-xl px-5 py-4 flex justify-between items-center">
+                        <span class="text-xs font-extrabold text-[#B45309] tracking-wider">TOTAL TAGIHAN</span>
+                        <span class="text-xl font-black text-[#B45309]">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</span>
+                    </div>
+
+                    <div class="mt-auto border-t border-gray-100 pt-6">
+                        <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-3 uppercase">Bukti Transfer Pelanggan</p>
+                        
+                        @if($pesanan->bukti_pembayaran)
+                            <a href="{{ asset($pesanan->bukti_pembayaran) }}" target="_blank" class="block w-full h-48 bg-gray-50 rounded-xl border border-gray-200 overflow-hidden relative group cursor-pointer mb-6">
+                                <img src="{{ asset($pesanan->bukti_pembayaran) }}" alt="Bukti Transfer" class="w-full h-full object-contain bg-gray-100">
+                                
+                                <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span class="text-white font-medium flex items-center">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> 
+                                        Klik untuk perbesar
+                                    </span>
+                                </div>
+                            </a>
+                        @else
+                            <div class="w-full py-4 mb-6 bg-red-50 text-red-500 rounded-xl border border-red-100 text-center text-sm font-medium">
+                                Pelanggan belum/gagal mengunggah bukti pembayaran.
+                            </div>
+                        @endif
+
+                        <form action="{{ route('pesanan.konfirmasiPembayaran', $pesanan->id ?? $pesanan->_id) }}" method="POST" class="w-full">
+                            @csrf
+                            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-sm flex justify-center items-center group">
+                                <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                Verifikasi & Masukkan Antrean
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
-          </div>
-
-          <div class="col-span-2 flex justify-between items-center bg-purple-50 px-4 py-2.5 rounded-lg border border-purple-100 mt-1">
-            <span class="text-[11px] font-black text-purple-700 uppercase tracking-wider">Total Tagihan</span>
-            <span class="text-[16px] font-black text-purple-700">Rp {{ number_format($pesanan->total_harga, 0, ',', '.') }}</span>
-          </div>
-        </div>
-
-        <div class="mb-5">
-          <div class="text-[11px] font-bold text-sg-sub uppercase tracking-wider mb-2 flex items-center gap-1">
-            <i class="bi bi-image text-purple-600"></i> Lampiran Bukti Transfer
-          </div>
-          @if(!empty($pesanan->gambar))
-            <a href="{{ $pesanan->gambar }}" target="_blank" class="group relative block w-full h-24 rounded-xl overflow-hidden border border-sg-border bg-gray-50 hover:border-purple-300 transition-colors">
-              <img src="{{ $pesanan->gambar }}" alt="Struk Transfer" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1">
-                <i class="bi bi-zoom-in"></i> Lihat Struk Ukuran Penuh
-              </div>
-            </a>
-          @else
-            <div class="w-full py-4 px-4 bg-gray-50 border border-dashed border-sg-border rounded-xl text-center text-xs text-sg-sub">
-              <i class="bi bi-exclamation-triangle mr-1"></i> Pelanggan belum mengunggah foto bukti transfer.
+        @empty
+            <div class="col-span-full bg-white rounded-2xl border border-gray-100 p-10 text-center">
+                <p class="text-gray-500">Tidak ada pembayaran tertunda yang menunggu verifikasi.</p>
             </div>
-          @endif
-        </div>
-
-        <form action="{{ route('pesanan.konfirmasiPembayaran', $pesanan->id) }}" method="POST" class="w-full mt-auto" onsubmit="return confirm('Apakah kamu sudah memeriksa struk dan ingin mengonfirmasi pembayaran lunas?')">
-          @csrf @method('PATCH')
-          <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl px-4 py-3.5 text-[14px] font-bold transition-colors flex items-center justify-center gap-2 shadow-sm">
-            <i class="bi bi-shield-check text-base"></i> Sahkan Pembayaran & Lanjutkan
-          </button>
-        </form>
-      </div>
-    @empty
-      <div class="col-span-full bg-white border border-sg-border rounded-2xl p-12 text-center shadow-sm">
-        <div class="text-sg-sub text-5xl mb-4"><i class="bi bi-credit-card-2-back"></i></div>
-        <p class="text-sg-text font-bold text-lg mb-1">Tidak ada pembayaran tertunda</p>
-        <p class="text-sg-sub text-sm">Semua transaksi transfer bank atau QRIS sudah diverifikasi bersih.</p>
-      </div>
-    @endforelse
-  </div>
+        @endforelse
+    </div>
 </div>
-
-<script>
-  function sortCards(gridId, order) {
-    const grid = document.getElementById(gridId);
-    const cards = Array.from(grid.querySelectorAll('.sortable-card'));
-    
-    if(cards.length === 0) return;
-
-    cards.sort((a, b) => {
-      const timeA = parseInt(a.getAttribute('data-time'));
-      const timeB = parseInt(b.getAttribute('data-time'));
-      return order === 'asc' ? timeA - timeB : timeB - timeA;
-    });
-
-    cards.forEach(card => grid.appendChild(card));
-  }
-</script>

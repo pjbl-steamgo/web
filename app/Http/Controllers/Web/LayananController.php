@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule; // Wajib ditambahkan untuk validasi MongoDB
 
 class LayananController extends Controller
 {
-    // 1. Fungsi Menampilkan Data (Diperbarui untuk MongoDB)
+    // 1. Fungsi Menampilkan Data (Sesuai dengan view 'index' kamu)
     public function index()
     {
         $layanans = Layanan::all();
@@ -33,16 +33,19 @@ class LayananController extends Controller
     // 2. Fungsi Tambah Data
     public function store(Request $request)
     {
-        // Validasi Unique yang aman untuk MongoDB
+        // Validasi Unique yang aman untuk MongoDB (Boleh nama sama asal kategori beda)
         $request->validate([
-            'nama_layanan'   => ['required', 'string', 'max:255', Rule::unique(Layanan::class, 'nama_layanan')],
+            'nama_layanan'   => [
+                'required', 'string', 'max:255', 
+                Rule::unique(Layanan::class, 'nama_layanan')->where('kategori', $request->kategori)
+            ],
             'kategori'       => ['required', 'string'], 
             'harga'          => ['required', 'numeric'],
             'estimasi_waktu' => ['required', 'numeric'],
             'slot_tersedia'  => ['required', 'numeric'],
             'deskripsi'      => ['required', 'string']
         ], [
-            'nama_layanan.unique' => 'Gagal! Nama layanan ini sudah terdaftar di database.'
+            'nama_layanan.unique' => 'Gagal! Nama layanan ini sudah terdaftar di kategori tersebut.'
         ]);
 
         Layanan::create([
@@ -67,7 +70,9 @@ class LayananController extends Controller
                 'required', 
                 'string', 
                 'max:255', 
-                Rule::unique(Layanan::class, 'nama_layanan')->ignore($id, '_id') // Ini cara benarnya di Laravel!
+                Rule::unique(Layanan::class, 'nama_layanan')
+                    ->where('kategori', $request->kategori)
+                    ->ignore($id, '_id') // Abaikan ID yang sedang diedit
             ],
             'kategori'       => ['required', 'string'], 
             'harga'          => ['required', 'numeric'],
@@ -75,7 +80,7 @@ class LayananController extends Controller
             'slot_tersedia'  => ['required', 'numeric'],
             'deskripsi'      => ['required', 'string']
         ], [
-            'nama_layanan.unique' => 'Gagal! Nama layanan tersebut sudah digunakan oleh layanan lain.'
+            'nama_layanan.unique' => 'Gagal! Nama layanan tersebut sudah digunakan oleh layanan lain di kategori ini.'
         ]);
 
         $layanan = Layanan::findOrFail($id);
@@ -111,6 +116,6 @@ class LayananController extends Controller
             'is_active' => !$currentState
         ]); 
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Status layanan berhasil diubah!');
     }
 }

@@ -65,6 +65,17 @@
     </div>
   @endif
 
+  @if(session('success'))
+    <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-xl shadow-sm flex justify-between items-start">
+      <div>
+        <h3 class="text-green-800 font-bold text-sm">{{ session('success') }}</h3>
+      </div>
+      <button onclick="this.parentElement.style.display='none'" class="text-green-400 hover:text-green-600 font-bold transition-colors">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  @endif
+
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
     <div>
       <h2 class="text-xl font-display font-bold text-sg-text">Kelola Layanan & Parameter</h2>
@@ -107,7 +118,7 @@
             $isActiveMtr = $itemMotor ? ($itemMotor->is_active ?? true) : false;
           @endphp
           
-          <div class="p-5 flex-1 flex flex-col {{ $itemMotor && !$isActiveMtr ? 'bg-gray-50/70 grayscale-[30%]' : '' }}">
+          <div class="p-5 flex-1 flex flex-col {{ $itemMotor && !$isActiveMtr ? 'bg-red-50/20 grayscale-[15%]' : '' }}">
             <div class="flex justify-between items-center mb-3">
               <div class="font-bold text-[14px] text-sg-text flex items-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-sm">
@@ -119,7 +130,7 @@
                 @if($isActiveMtr)
                   <span class="px-2.5 py-1 bg-[#DCFCE7] text-[#16A34A] text-[10px] font-bold rounded-md uppercase tracking-wider">Aktif</span>
                 @else
-                  <span class="px-2.5 py-1 bg-gray-200 text-gray-500 text-[10px] font-bold rounded-md uppercase tracking-wider">Tutup</span>
+                  <span class="px-2.5 py-1 bg-red-100 text-red-600 text-[10px] font-bold rounded-md uppercase tracking-wider">Tutup</span>
                 @endif
               @endif
             </div>
@@ -154,11 +165,13 @@
                         onclick="openEditLayananModal(this)">
                   <i class="bi bi-pencil-square text-sm"></i> Edit Data
                 </button>
-                <button class="w-10 h-10 bg-white border border-sg-border rounded-xl flex items-center justify-center transition-all flex-shrink-0 {{ $isActiveMtr ? 'text-sg-green hover:bg-[#DCFCE7] hover:border-green-300' : 'text-sg-sub hover:bg-gray-100' }}"
+                
+                <button class="w-10 h-10 bg-white border border-sg-border rounded-xl flex items-center justify-center transition-all flex-shrink-0 {{ $isActiveMtr ? 'text-sg-green hover:bg-[#DCFCE7] hover:border-green-300' : 'text-red-500 hover:bg-red-50 hover:border-red-300' }}"
                         data-url="{{ route('layanan.toggle', $itemMotor->id) }}" data-nama="{{ $itemMotor->nama_layanan }}" data-status="{{ $isActiveMtr ? 'aktif' : 'tidak_aktif' }}"
                         onclick="openToggleLayananModal(this)" title="Buka/Tutup">
-                  <i class="bi {{ $isActiveMtr ? 'bi-toggle-on' : 'bi-toggle-off' }} text-[18px]"></i>
+                  <i class="bi {{ $isActiveMtr ? 'bi-toggle-on' : 'bi-toggle-off' }} text-[20px]"></i>
                 </button>
+                
                 <button class="w-10 h-10 bg-white border border-sg-border text-sg-red hover:bg-red-50 hover:border-red-200 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
                         data-url="{{ route('layanan.destroy', $itemMotor->id) }}" data-nama="{{ $itemMotor->nama_layanan }}"
                         onclick="openDeleteLayananModal(this)" title="Hapus Layanan">
@@ -180,7 +193,7 @@
             $isActiveMbl = $itemMobil ? ($itemMobil->is_active ?? true) : false;
           @endphp
 
-          <div class="p-5 flex-1 flex flex-col {{ $itemMobil && !$isActiveMbl ? 'bg-gray-50/70 grayscale-[30%]' : '' }}">
+          <div class="p-5 flex-1 flex flex-col {{ $itemMobil && !$isActiveMbl ? 'bg-red-50/20 grayscale-[15%]' : '' }}">
             <div class="flex justify-between items-center mb-3">
               <div class="font-bold text-[14px] text-sg-text flex items-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
@@ -192,7 +205,7 @@
                 @if($isActiveMbl)
                   <span class="px-2.5 py-1 bg-[#DCFCE7] text-[#16A34A] text-[10px] font-bold rounded-md uppercase tracking-wider">Aktif</span>
                 @else
-                  <span class="px-2.5 py-1 bg-gray-200 text-gray-500 text-[10px] font-bold rounded-md uppercase tracking-wider">Tutup</span>
+                  <span class="px-2.5 py-1 bg-red-100 text-red-600 text-[10px] font-bold rounded-md uppercase tracking-wider">Tutup</span>
                 @endif
               @endif
             </div>
@@ -227,11 +240,13 @@
                         onclick="openEditLayananModal(this)">
                   <i class="bi bi-pencil-square text-sm"></i> Edit Data
                 </button>
-                <button class="w-10 h-10 bg-white border border-sg-border rounded-xl flex items-center justify-center transition-all flex-shrink-0 {{ $isActiveMbl ? 'text-sg-green hover:bg-[#DCFCE7] hover:border-green-300' : 'text-sg-sub hover:bg-gray-100' }}"
+                
+                <button class="w-10 h-10 bg-white border border-sg-border rounded-xl flex items-center justify-center transition-all flex-shrink-0 {{ $isActiveMbl ? 'text-sg-green hover:bg-[#DCFCE7] hover:border-green-300' : 'text-red-500 hover:bg-red-50 hover:border-red-300' }}"
                         data-url="{{ route('layanan.toggle', $itemMobil->id) }}" data-nama="{{ $itemMobil->nama_layanan }}" data-status="{{ $isActiveMbl ? 'aktif' : 'tidak_aktif' }}"
                         onclick="openToggleLayananModal(this)" title="Buka/Tutup">
-                  <i class="bi {{ $isActiveMbl ? 'bi-toggle-on' : 'bi-toggle-off' }} text-[18px]"></i>
+                  <i class="bi {{ $isActiveMbl ? 'bi-toggle-on' : 'bi-toggle-off' }} text-[20px]"></i>
                 </button>
+                
                 <button class="w-10 h-10 bg-white border border-sg-border text-sg-red hover:bg-red-50 hover:border-red-200 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
                         data-url="{{ route('layanan.destroy', $itemMobil->id) }}" data-nama="{{ $itemMobil->nama_layanan }}"
                         onclick="openDeleteLayananModal(this)" title="Hapus Layanan">
@@ -287,6 +302,25 @@
   </form>
 </div>
 
+<div id="modal-toggle-layanan" class="modal-panel hidden fixed z-[2001] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-full max-w-sm bg-white rounded-2xl shadow-2xl mx-auto">
+  <form id="form-toggle-layanan" method="POST">
+    @csrf
+    <div class="p-6 text-center">
+      <div id="toggle-icon-container">
+        <i id="toggle-icon"></i>
+      </div>
+      <h5 id="toggle-title" class="font-display font-bold text-[19px] mb-2"></h5>
+      <p class="text-sm text-sg-sub mb-6">
+        Apakah Anda yakin ingin <strong id="toggle-action-text" class="text-sg-text"></strong> <span id="toggle-nama-layanan"></span> untuk sementara waktu?
+      </p>
+      <div class="flex gap-2 justify-center">
+        <button type="button" class="bg-white text-sg-text border border-sg-border font-semibold rounded-xl px-5 py-2.5 text-sm flex-1 hover:bg-gray-50 transition-colors" onclick="closeModal('modal-toggle-layanan')">Batal</button>
+        <button type="submit" id="toggle-submit-btn"></button>
+      </div>
+    </div>
+  </form>
+</div>
+
 <script>
   function searchLayanan() {
       const keyword = document.getElementById('layanan-search').value.toLowerCase();
@@ -295,7 +329,6 @@
       let visibleCount = 0;
 
       cards.forEach(card => {
-          // Hanya mencari berdasarkan teks yang ada di dalam Judul (<h3>)
           const namaLayanan = card.querySelector('h3').innerText.toLowerCase();
           
           if (namaLayanan.includes(keyword)) {
@@ -325,22 +358,24 @@
       const deskripsi = button.getAttribute('data-deskripsi');
 
       const form = document.getElementById('form-edit-layanan');
-      form.action = `/layanan/${id}`;
+      if(form) form.action = `/layanan/${id}`;
 
-      document.getElementById('edit-nama-layanan').value = nama;
+      if(document.getElementById('edit-nama-layanan')) document.getElementById('edit-nama-layanan').value = nama;
       
       const selectKategori = document.getElementById('edit-kategori');
-      for (let i = 0; i < selectKategori.options.length; i++) {
-          if (selectKategori.options[i].value.toLowerCase() === kategori.toLowerCase()) {
-              selectKategori.selectedIndex = i;
-              break;
+      if (selectKategori) {
+          for (let i = 0; i < selectKategori.options.length; i++) {
+              if (selectKategori.options[i].value.toLowerCase() === kategori.toLowerCase()) {
+                  selectKategori.selectedIndex = i;
+                  break;
+              }
           }
       }
 
-      document.getElementById('edit-harga').value = harga;
-      document.getElementById('edit-estimasi').value = textEstimasi;
-      document.getElementById('edit-slot-tersedia').value = slot; 
-      document.getElementById('edit-deskripsi').value = deskripsi;
+      if(document.getElementById('edit-harga')) document.getElementById('edit-harga').value = harga;
+      if(document.getElementById('edit-estimasi')) document.getElementById('edit-estimasi').value = textEstimasi;
+      if(document.getElementById('edit-slot-tersedia')) document.getElementById('edit-slot-tersedia').value = slot; 
+      if(document.getElementById('edit-deskripsi')) document.getElementById('edit-deskripsi').value = deskripsi;
 
       openModal('modal-edit-layanan');
   }
@@ -360,17 +395,19 @@
       const submitBtn = document.getElementById('toggle-submit-btn');
 
       if (status === 'aktif') {
+          // LOGIKA SAAT MAU DITUTUP (TAMPILAN MERAH)
           titleEl.innerText = "Tutup Layanan?";
           actionTextEl.innerText = "menutup";
-          iconContainer.className = "w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 bg-orange-100 text-orange-600";
-          iconEl.className = "bi bi-eye-slash";
-          submitBtn.className = "bg-orange-500 text-white font-semibold rounded-xl px-5 py-2.5 text-sm flex-1 hover:bg-orange-600 transition-colors";
+          iconContainer.className = "w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 bg-red-100 text-red-600";
+          iconEl.className = "bi bi-toggle-off";
+          submitBtn.className = "bg-red-500 text-white font-semibold rounded-xl px-5 py-2.5 text-sm flex-1 hover:bg-red-600 transition-colors";
           submitBtn.innerText = "Ya, Tutup";
       } else {
+          // LOGIKA SAAT MAU DIBUKA KEMBALI (TAMPILAN HIJAU)
           titleEl.innerText = "Buka Layanan?";
           actionTextEl.innerText = "membuka";
           iconContainer.className = "w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 bg-[#DCFCE7] text-[#16A34A]";
-          iconEl.className = "bi bi-eye";
+          iconEl.className = "bi bi-toggle-on";
           submitBtn.className = "bg-[#16A34A] text-white font-semibold rounded-xl px-5 py-2.5 text-sm flex-1 hover:bg-green-700 transition-colors";
           submitBtn.innerText = "Ya, Buka";
       }
@@ -386,5 +423,14 @@
       document.getElementById('hapus-nama-layanan').innerText = nama;
 
       openModal('modal-hapus-layanan');
+  }
+  
+  function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if(modal) {
+          modal.classList.add('hidden');
+      } else {
+          document.querySelectorAll('.modal-panel').forEach(m => m.classList.add('hidden'));
+      }
   }
 </script>
