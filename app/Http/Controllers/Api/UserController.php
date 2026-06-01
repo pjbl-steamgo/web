@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User; // Pastikan ini mengarah ke model User kamu
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
 
 class UserController extends Controller
 {
@@ -68,6 +70,32 @@ class UserController extends Controller
                 'success' => false,
                 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function updatePassword(Request $request, $id_user)
+    {
+        try {
+            $user = User::where('id_user', $id_user)->first();
+
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'User tidak ditemukan'], 404);
+            }
+
+            // Hanya memvalidasi password_baru
+            $request->validate([
+                'password_baru' => 'required|min:6|confirmed', 
+            ]);
+
+            // Langsung update password di database
+            $user->update([
+                'password' => \Illuminate\Support\Facades\Hash::make($request->password_baru)
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Kata sandi berhasil diubah'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
 }

@@ -17,14 +17,31 @@ class AntrianController extends Controller
         $antrians = Pesanan::with('layanan')
             ->whereIn('status', ['Proses', 'Antri'])
             ->orderBy('tanggal', 'asc')
-            ->orderBy('created_at', 'asc') // Menjaga urutan FIFO di tampilan Admin
+            ->orderBy('created_at', 'asc')
             ->get();
             
-        // 2. Ambil SEMUA data layanan untuk diisi ke dalam dropdown filter
+        // 2. Ambil SEMUA data layanan
         $layanans = Layanan::all();
 
-        // 3. Ambil data Jam Operasional
-        $jamOperasionals = JamOperasional::all();
+        // 3. Ambil data Jam Operasional dan URUTKAN dari database
+        $jamOperasionals = JamOperasional::orderBy('jam', 'asc')->get();
+
+        // 4. Jika database kosong, buat data default (statis) yang sudah terurut
+        if ($jamOperasionals->isEmpty()) {
+            $jamStatis = [
+                '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00',
+                '12:00 - 13:00', '13:00 - 14:00', '14:00 - 15:00', '15:00 - 16:00',
+                '16:00 - 17:00', '17:00 - 18:00', '18:00 - 19:00', '19:00 - 20:00'
+            ];
+            
+            $jamOperasionals = collect($jamStatis)->map(function($jam, $index) {
+                return (object)[
+                    'id' => 'statis-' . $index,
+                    'jam' => $jam,
+                    'is_active' => true
+                ];
+            });
+        }
 
         return view('index', [
             'initPage' => 'antrian-jadwal',
@@ -34,38 +51,28 @@ class AntrianController extends Controller
         ]);
     }
 
-    // Fungsi untuk memperbarui status antrian (misal dari "Proses" menjadi "Selesai")
     public function updateStatus(Request $request, $id)
     {
         $pesanan = Pesanan::findOrFail($id);
         
         $request->validate([
-            'status' => 'required|in:Antri,Proses,Selesai,Batal,Dihapus' // Sesuaikan dengan enum di databasemu
+            'status' => 'required|in:Antri,Proses,Selesai,Batal,Dihapus'
         ]);
 
-        // Simpan status lama untuk pengecekan
         $statusLama = $pesanan->status;
         $statusBaru = $request->status;
 
-        // Ubah status pesanan yang diklik Admin
         $pesanan->update([
             'status' => $statusBaru
         ]);
 
-        // ==============================================================
-        // LOGIKA OTOMATIS MEMAJUKAN SISTEM ANTREAN FIFO (QUEUE SHIFTING)
-        // ==============================================================
-        // Jika pesanan yang tadinya 'Proses' diubah menjadi 'Selesai' atau dibatalkan
         if ($statusLama === 'Proses' && in_array($statusBaru, ['Selesai', 'Batal', 'Dihapus'])) {
-            
-            // Cari 1 orang pertama (First In) yang statusnya 'Antri' di tanggal dan layanan yang sama
             $antreanBerikutnya = Pesanan::where('tanggal', $pesanan->tanggal)
                 ->where('layanan_id', $pesanan->layanan_id)
                 ->where('status', 'Antri')
-                ->orderBy('created_at', 'asc') // Paling dulu booking = Paling atas
+                ->orderBy('created_at', 'asc')
                 ->first();
 
-            // Jika ada antrean selanjutnya, otomatis naik jadi Proses
             if ($antreanBerikutnya) {
                 $antreanBerikutnya->update([
                     'status' => 'Proses'

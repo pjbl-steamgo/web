@@ -8,9 +8,9 @@
             @include('pages.dashboard')
             @break
 
-        @case('antrian')
-            @include('pages.antrian')
-            @break
+        @case('antrian-jadwal')
+                @include('pages.antrian') 
+                @break
 
         @case('pesanan')
             @include('pages.pesanan')

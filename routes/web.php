@@ -6,6 +6,7 @@ use App\Http\Controllers\Web\PesananController;
 use App\Http\Controllers\Web\AntrianController;
 use App\Http\Controllers\Web\PelangganController;
 use App\Http\Controllers\Web\OrderAdminController;
+use App\Http\Controllers\Web\ChatAdminController;
 
 // Redirect dari root URL (/) ke /dashboard
 Route::get('/', function () {
@@ -53,9 +54,8 @@ Route::get('/laporan', function () {
 })->name('laporan');
 
 // Rute Pesan Pelanggan (Chat)
-Route::get('/chat', function () {
-    return view('index', ['initPage' => 'chat']);
-})->name('chat');
+Route::get('/chat', [ChatAdminController::class, 'index'])->name('admin.chat');
+Route::post('/chat/{user_id}/reply', [ChatAdminController::class, 'reply'])->name('admin.chat.reply');
 
 // Rute Pengaturan Sistem
 Route::get('/pengaturan', function () {

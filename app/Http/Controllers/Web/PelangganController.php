@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use App\Models\User; // Pastikan diarahkan ke model User/Pelanggan milikmu
+use App\Models\User;
+use App\Models\Pesanan; // <--- DITAMBAHKAN
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -15,8 +16,15 @@ class PelangganController extends Controller
      */
     public function index()
     {
-        // Mengambil semua user dengan urutan pendaftaran terbaru
+        // 1. Mengambil semua user dengan urutan pendaftaran terbaru
         $pelanggans = User::orderBy('created_at', 'desc')->get();
+
+        // 2. Loop untuk menghitung jumlah pesanan tiap pelanggan
+        foreach ($pelanggans as $pelanggan) {
+            // Kita hitung jumlah pesanan berdasarkan user_id yang ada di tabel Pesanan
+            // Pastikan 'user_id' di tabel Pesanan sesuai dengan ID yang disimpan di User
+            $pelanggan->jumlah_pesanan = Pesanan::where('user_id', $pelanggan->id_user)->count();
+        }
 
         return view('index', [
             'initPage' => 'pelanggan',
@@ -25,11 +33,11 @@ class PelangganController extends Controller
     }
 
     /**
-     * Proses Simpan Akun Baru (Simulator Aplikasi Mobile)
+     * Proses Simpan Akun Baru
      */
     public function store(Request $request)
     {
-        // 1. Validasi Input Data (Menggunakan Model secara Langsung)
+        // 1. Validasi Input Data
         $request->validate([
             'username'    => ['required', 'string', 'min:3', Rule::unique(User::class, 'username')],
             'no_hp'       => ['required', 'string', 'min:10', Rule::unique(User::class, 'no_hp')],
@@ -51,11 +59,7 @@ class PelangganController extends Controller
             $fotoPath = $request->file('foto_profil')->store('foto_profil', 'public');
         }
 
-        // 4. LOGIKA TIER MEMBER
-        $jumlahPesananAwal = 0;
-        $tierMember = 'Silver';
-
-        // 5. SIMPAN KE MONGODB
+        // 4. SIMPAN KE MONGODB
         User::create([
             'id_user'        => $idUser,
             'username'       => $request->username,
@@ -63,8 +67,8 @@ class PelangganController extends Controller
             'email'          => $request->email,
             'password'       => Hash::make($request->password),
             'foto_profil'    => $fotoPath,
-            'jumlah_pesanan' => $jumlahPesananAwal, 
-            'member'         => $tierMember,
+            'jumlah_pesanan' => 0, 
+            'member'         => 'Silver',
         ]);
 
         return redirect()->back()->with('success', 'Akun User baru berhasil dibuat dengan ID: ' . $idUser);

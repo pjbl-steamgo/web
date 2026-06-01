@@ -80,9 +80,9 @@
                       </button>
                   @endif
                   
-                  <button type="button" class="w-9 h-9 rounded-xl bg-white border border-sg-border text-sg-sub hover:text-sg-blue hover:border-sg-blue flex items-center justify-center transition-colors" title="Chat Pelanggan">
+                  <a href="{{ url('/chat?user=' . ($pesanan->user_id ?? $pesanan->id_user ?? $pesanan->pelanggan_id)) }}" class="w-9 h-9 rounded-xl bg-white border border-sg-border text-sg-sub hover:text-sg-blue hover:border-sg-blue flex items-center justify-center transition-colors" title="Chat Pelanggan">
                       <i class="bi bi-chat-dots"></i>
-                  </button>
+                  </a>
 
                 </div>
               </td>
@@ -157,9 +157,9 @@
                 </button>
             @endif
             
-            <button type="button" class="w-10 h-10 rounded-xl bg-white border border-sg-border text-sg-sub hover:text-sg-blue hover:border-sg-blue flex items-center justify-center transition-colors">
+            <a href="{{ url('/chat?user=' . ($pesanan->user_id ?? $pesanan->id_user ?? $pesanan->pelanggan_id)) }}" class="w-10 h-10 rounded-xl bg-white border border-sg-border text-sg-sub hover:text-sg-blue hover:border-sg-blue flex items-center justify-center transition-colors">
                 <i class="bi bi-chat-dots"></i>
-            </button>
+            </a>
             
           </div>
         </div>

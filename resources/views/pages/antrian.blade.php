@@ -1,4 +1,4 @@
-<div class="page {{ ($initPage ?? '') === 'antrian-jadwal' ? 'active' : '' }}" id="page-antrian-jadwal">
+<div class="page {{ in_array($initPage ?? '', ['antrian', 'antrian-jadwal']) ? 'active' : '' }}" id="page-antrian-jadwal">
   
   <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
     
@@ -204,7 +204,7 @@
           $listJam = $jamOperasionals ?? collect([]);
           if ($listJam->isEmpty()) {
               $jamStatis = [
-                  '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00',
+                  '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 13:00',
                   '13:00 - 14:00', '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00',
                   '17:00 - 18:00', '18:00 - 19:00', '19:00 - 20:00'
               ];

@@ -1,97 +1,93 @@
-<div class="w-full">
+<div class="page {{ ($initPage ?? '') === 'konfirmasi-booking' ? 'active' : 'hidden' }}" id="page-konfirmasi-booking">
+    
     <div class="mb-6 flex justify-between items-end">
         <div>
-            <h2 class="text-2xl font-bold text-gray-900">Konfirmasi Booking Masuk</h2>
-            <p class="text-gray-500 text-sm mt-1">Periksa kelengkapan data pesanan dan terima booking pelanggan.</p>
+            <h2 class="text-xl font-display font-bold text-sg-text">Konfirmasi Booking Masuk</h2>
+            <p class="text-sm text-sg-sub mt-1">Periksa kelengkapan data pesanan dan terima booking pelanggan.</p>
         </div>
         
-        <div class="hidden md:flex items-center bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-sm cursor-pointer hover:bg-gray-50">
-            <span class="text-sm font-bold text-gray-800">Urutkan: Terlama (Prioritas)</span>
-            <svg class="w-4 h-4 ml-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        <div class="hidden md:flex items-center bg-white border border-sg-border rounded-xl px-4 py-2.5 shadow-sm cursor-pointer hover:border-sg-blue transition-all">
+            <span class="text-sm font-bold text-sg-text">Urutkan: Terlama (Prioritas)</span>
+            <i class="bi bi-chevron-down ml-2 text-sg-sub text-sm"></i>
         </div>
     </div>
 
     @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('success') }}</span>
+        <div class="mb-5 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm">
+            <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
         </div>
     @endif
+    
     @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            <span class="block sm:inline">{{ session('error') }}</span>
+        <div class="mb-5 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm">
+            <i class="bi bi-x-circle-fill"></i> {{ session('error') }}
         </div>
     @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         @forelse ($pesanans as $pesanan)
-            <div class="bg-white rounded-[20px] border border-gray-100 shadow-sm relative overflow-hidden flex flex-col h-full">
+            <div class="bg-white rounded-2xl border border-sg-border shadow-sm relative overflow-hidden flex flex-col h-full">
                 
-                <div class="absolute top-0 right-0 bg-[#FFF3CD] text-[#B78103] text-[10px] font-bold px-4 py-1.5 rounded-bl-xl">
-                    PERLU RESPON
+                <div class="absolute top-0 right-0 bg-[#FFF7ED] text-[#F97316] text-[10px] font-bold px-4 py-1.5 rounded-bl-xl tracking-wider uppercase">
+                    Perlu Respon
                 </div>
 
                 <div class="p-6 md:p-8 flex flex-col flex-grow">
                     <div class="flex items-center space-x-4 mb-8">
-                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-500 font-bold text-xl flex-shrink-0">
+                        <div class="w-12 h-12 bg-sg-bg rounded-full flex items-center justify-center text-sg-blue font-bold text-xl flex-shrink-0">
                             {{ strtoupper(substr($pesanan->nama_pelanggan ?? 'U', 0, 1)) }}
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-gray-800">
-                                Kode Pesanan : <span class="font-bold text-black">{{ $pesanan->kode_pesanan ?? '-' }}</span>
-                            </p>
+                            <p class="text-[12px] font-bold text-sg-sub uppercase tracking-wider">Kode Pesanan</p>
+                            <p class="text-lg font-bold text-sg-text">{{ $pesanan->kode_pesanan ?? '-' }}</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-y-6 gap-x-4 flex-grow">
                         <div>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">ID User / Nama</p>
-                            <p class="text-sm font-bold text-gray-900 truncate">{{ $pesanan->nama_pelanggan ?? $pesanan->user_id ?? '-' }}</p>
+                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">ID User / Nama</p>
+                            <p class="text-[13px] font-bold text-sg-text truncate">{{ $pesanan->nama_pelanggan ?? $pesanan->user_id ?? '-' }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">No. Handphone</p>
-                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->no_hp ?? '-' }}</p>
-                        </div>
-
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Layanan Dipilih</p>
-                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->layanan->nama_layanan ?? 'Steam Wash' }}</p>
+                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">No. Handphone</p>
+                            <p class="text-[13px] font-bold text-sg-text">{{ $pesanan->no_hp ?? '-' }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Kategori</p>
-                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->layanan->kategori ?? 'Motor' }}</p>
-                        </div>
-
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Kendaraan</p>
-                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->kendaraan ?? '-' }}</p>
+                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">Layanan</p>
+                            <p class="text-[13px] font-bold text-sg-text">{{ $pesanan->layanan->nama_layanan ?? 'Steam Wash' }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Waktu Booking</p>
-                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->tanggal ?? '-' }}</p>
-                        </div>
-
-                        <div>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Metode Pembayaran</p>
-                            <p class="text-sm font-bold text-gray-900">{{ $pesanan->metode_pembayaran ?? '-' }}</p>
+                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">Kategori</p>
+                            <p class="text-[13px] font-bold text-sg-text">{{ $pesanan->layanan->kategori ?? 'Motor' }}</p>
                         </div>
                         <div>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Harga Layanan</p>
-                            <p class="text-sm font-bold text-gray-900">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</p>
+                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">Kendaraan</p>
+                            <p class="text-[13px] font-bold text-sg-text">{{ $pesanan->kendaraan ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">Waktu Booking</p>
+                            <p class="text-[13px] font-bold text-sg-text">{{ $pesanan->tanggal ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">Metode Pembayaran</p>
+                            <p class="text-[13px] font-bold text-sg-text">{{ $pesanan->metode_pembayaran ?? '-' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">Harga</p>
+                            <p class="text-[13px] font-bold text-sg-text">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</p>
                         </div>
                     </div>
 
-                    <div class="mt-8 bg-[#FFF9E6] border border-[#FDE68A] rounded-xl px-5 py-4 flex justify-between items-center">
-                        <span class="text-xs font-extrabold text-[#B45309] tracking-wider">TOTAL TAGIHAN</span>
-                        <span class="text-xl font-black text-[#B45309]">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</span>
+                    <div class="mt-8 bg-sg-bg border border-sg-border rounded-xl px-5 py-4 flex justify-between items-center">
+                        <span class="text-[11px] font-extrabold text-sg-sub tracking-wider uppercase">Total Tagihan</span>
+                        <span class="text-xl font-black text-sg-blue">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</span>
                     </div>
 
                     <div class="mt-6">
                         <form action="{{ route('pesanan.konfirmasiBooking', $pesanan->id ?? $pesanan->_id) }}" method="POST" class="w-full">
                             @csrf
-                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-sm flex justify-center items-center group">
-                                <svg class="w-5 h-5 mr-2 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
+                            <button type="submit" class="w-full bg-sg-blue hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-all shadow-sm flex justify-center items-center gap-2">
+                                <i class="bi bi-check-circle text-lg"></i>
                                 Konfirmasi Booking
                             </button>
                         </form>
@@ -99,8 +95,8 @@
                 </div>
             </div>
         @empty
-            <div class="col-span-full bg-white rounded-2xl border border-gray-100 p-10 text-center">
-                <p class="text-gray-500">Belum ada booking yang menunggu konfirmasi.</p>
+            <div class="col-span-full bg-white rounded-2xl border border-sg-border p-10 text-center">
+                <p class="text-sg-sub text-sm">Belum ada booking yang menunggu konfirmasi.</p>
             </div>
         @endforelse
     </div>
