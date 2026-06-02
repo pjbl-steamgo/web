@@ -4,18 +4,15 @@
     
     <div class="w-full md:w-auto">
       <div class="text-[11px] font-bold text-white/50 uppercase tracking-widest mb-1">Total Pendapatan</div>
-      <span class="stat-number-lg text-4xl sm:text-[42px] break-all">Rp 24.750.000</span>
-      <div class="text-[13px] text-sg-green mt-2 font-semibold flex items-center gap-1.5">
-        <i class="bi bi-arrow-up-right-circle-fill"></i> 23% dibanding bulan lalu
-      </div>
+      <span class="stat-number-lg text-4xl sm:text-[42px] break-all">Rp {{ number_format($totalPendapatan ?? 0, 0, ',', '.') }}</span>
     </div>
     
     <div class="w-full md:w-auto flex flex-col sm:flex-row md:flex-col items-stretch sm:items-center md:items-end gap-3 sm:gap-4 md:gap-3">
       
       <div class="flex gap-1 w-full sm:w-auto bg-white/5 p-1.5 rounded-xl border border-white/10">
-        <button class="flex-1 sm:flex-none text-sm font-semibold rounded-lg px-4 py-2 sm:py-1.5 text-white/70 hover:bg-white/10 transition-colors" onclick="selPeriod(this)">Hari</button>
-        <button class="flex-1 sm:flex-none text-sm font-semibold rounded-lg px-4 py-2 sm:py-1.5 bg-sg-blue text-white shadow-sm" onclick="selPeriod(this)">Bulan</button>
-        <button class="flex-1 sm:flex-none text-sm font-semibold rounded-lg px-4 py-2 sm:py-1.5 text-white/70 hover:bg-white/10 transition-colors" onclick="selPeriod(this)">Tahun</button>
+        <a href="?periode=hari" class="flex-1 sm:flex-none text-sm font-semibold rounded-lg px-4 py-2 sm:py-1.5 text-center transition-colors {{ request('periode') == 'hari' ? 'bg-sg-blue text-white shadow-sm' : 'text-white/70 hover:bg-white/10' }}">Hari</a>
+        <a href="?periode=bulan" class="flex-1 sm:flex-none text-sm font-semibold rounded-lg px-4 py-2 sm:py-1.5 text-center transition-colors {{ request('periode') == 'bulan' || !request('periode') ? 'bg-sg-blue text-white shadow-sm' : 'text-white/70 hover:bg-white/10' }}">Bulan</a>
+        <a href="?periode=tahun" class="flex-1 sm:flex-none text-sm font-semibold rounded-lg px-4 py-2 sm:py-1.5 text-center transition-colors {{ request('periode') == 'tahun' ? 'bg-sg-blue text-white shadow-sm' : 'text-white/70 hover:bg-white/10' }}">Tahun</a>
       </div>
       
       <div class="flex gap-2 w-full sm:w-auto">
@@ -35,39 +32,41 @@
     <div class="bg-white rounded-2xl p-5 border border-sg-border shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
       <div class="absolute right-4 top-4 w-11 h-11 rounded-xl bg-sg-bluelt flex items-center justify-center text-xl shadow-sm">📦</div>
       <div class="text-[11px] font-bold text-sg-sub uppercase tracking-wide pr-12">Total Pesanan</div>
-      <span class="stat-number text-2xl md:text-[30px] mt-2">312</span>
-      <div class="text-xs font-semibold mt-3 text-sg-green flex items-center gap-0.5">
-        <i class="bi bi-arrow-up-short text-lg leading-none"></i> 12% dari bulan lalu
-      </div>
+      <span class="stat-number text-2xl md:text-[30px] mt-2">{{ number_format($totalPesanan ?? 0, 0, ',', '.') }}</span>
     </div>
     
     <div class="bg-white rounded-2xl p-5 border border-sg-border shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
       <div class="absolute right-4 top-4 w-11 h-11 rounded-xl bg-sg-greenlt flex items-center justify-center text-xl shadow-sm">🏍️</div>
       <div class="text-[11px] font-bold text-sg-sub uppercase tracking-wide pr-12">Pesanan Motor</div>
-      <span class="stat-number text-2xl md:text-[30px] mt-2">198</span>
-      <div class="text-xs font-medium mt-3 text-sg-sub flex items-center gap-1.5">
-        <div class="w-2 h-2 rounded-full bg-sg-green"></div> 63% dari total
-      </div>
+      <span class="stat-number text-2xl md:text-[30px] mt-2">{{ number_format($totalPesananMotor ?? 0, 0, ',', '.') }}</span>
     </div>
     
     <div class="bg-white rounded-2xl p-5 border border-sg-border shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
       <div class="absolute right-4 top-4 w-11 h-11 rounded-xl bg-sg-orangelt flex items-center justify-center text-xl shadow-sm">🚗</div>
       <div class="text-[11px] font-bold text-sg-sub uppercase tracking-wide pr-12">Pesanan Mobil</div>
-      <span class="stat-number text-2xl md:text-[30px] mt-2">114</span>
-      <div class="text-xs font-medium mt-3 text-sg-sub flex items-center gap-1.5">
-        <div class="w-2 h-2 rounded-full bg-sg-orange"></div> 37% dari total
-      </div>
+      <span class="stat-number text-2xl md:text-[30px] mt-2">{{ number_format($totalPesananMobil ?? 0, 0, ',', '.') }}</span>
     </div>
     
     <div class="bg-white rounded-2xl p-5 border border-sg-border shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
       <div class="absolute right-4 top-4 w-11 h-11 rounded-xl bg-sg-yellowlt flex items-center justify-center text-xl shadow-sm">⭐</div>
       <div class="text-[11px] font-bold text-sg-sub uppercase tracking-wide pr-12">Rata-rata/Pesanan</div>
-      <span class="stat-number text-2xl md:text-[30px] mt-2">Rp 79K</span>
-      <div class="text-xs font-semibold mt-3 text-sg-green flex items-center gap-0.5">
-        <i class="bi bi-arrow-up-short text-lg leading-none"></i> dari Rp 65K
-      </div>
+      <span class="stat-number text-2xl md:text-[30px] mt-2">Rp {{ number_format(floor(($rataRataPesanan ?? 0) / 1000), 0, ',', '.') }}K</span>
     </div>
-    
   </div>
 
+  <script>
+    function exportCSV() {
+        // Mengarahkan ke rute export CSV
+        window.location.href = "{{ route('laporan.exportCsv') }}";
+    }
+
+    function exportPDF() {
+        // Mengarahkan ke rute export PDF
+        window.location.href = "{{ route('laporan.exportPdf') }}";
+    }
+
+    function selPeriod(btn) {
+        // Logika untuk tab Hari/Bulan/Tahun (sudah dihandle via <a> di kode sebelumnya)
+    }
+  </script>
 </div>

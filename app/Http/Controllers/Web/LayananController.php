@@ -42,7 +42,6 @@ class LayananController extends Controller
             'kategori'       => ['required', 'string'], 
             'harga'          => ['required', 'numeric'],
             'estimasi_waktu' => ['required', 'numeric'],
-            'slot_tersedia'  => ['required', 'numeric'],
             'deskripsi'      => ['required', 'string']
         ], [
             'nama_layanan.unique' => 'Gagal! Nama layanan ini sudah terdaftar di kategori tersebut.'
@@ -53,7 +52,6 @@ class LayananController extends Controller
             'kategori'       => $request->kategori,
             'harga'          => (int) $request->harga,
             'estimasi_waktu' => (int) $request->estimasi_waktu,
-            'slot_tersedia'  => (int) $request->slot_tersedia,
             'deskripsi'      => $request->deskripsi,
             'is_active'      => true
         ]);
@@ -77,7 +75,6 @@ class LayananController extends Controller
             'kategori'       => ['required', 'string'], 
             'harga'          => ['required', 'numeric'],
             'estimasi_waktu' => ['required', 'numeric'],
-            'slot_tersedia'  => ['required', 'numeric'],
             'deskripsi'      => ['required', 'string']
         ], [
             'nama_layanan.unique' => 'Gagal! Nama layanan tersebut sudah digunakan oleh layanan lain di kategori ini.'
@@ -89,7 +86,6 @@ class LayananController extends Controller
             'kategori'       => $request->kategori,
             'harga'          => (int) $request->harga,
             'estimasi_waktu' => (int) $request->estimasi_waktu,
-            'slot_tersedia'  => (int) $request->slot_tersedia,
             'deskripsi'      => $request->deskripsi,
         ]);
 

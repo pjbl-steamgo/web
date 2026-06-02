@@ -1,11 +1,6 @@
 <div class="page {{ ($initPage ?? '') === 'konfirmasi-booking' ? 'active' : 'hidden' }}" id="page-konfirmasi-booking">
     
     <div class="mb-6 flex justify-between items-end">
-        <div>
-            <h2 class="text-xl font-display font-bold text-sg-text">Konfirmasi Booking Masuk</h2>
-            <p class="text-sm text-sg-sub mt-1">Periksa kelengkapan data pesanan dan terima booking pelanggan.</p>
-        </div>
-        
         <div class="hidden md:flex items-center bg-white border border-sg-border rounded-xl px-4 py-2.5 shadow-sm cursor-pointer hover:border-sg-blue transition-all">
             <span class="text-sm font-bold text-sg-text">Urutkan: Terlama (Prioritas)</span>
             <i class="bi bi-chevron-down ml-2 text-sg-sub text-sm"></i>
@@ -45,7 +40,7 @@
 
                     <div class="grid grid-cols-2 gap-y-6 gap-x-4 flex-grow">
                         <div>
-                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">ID User / Nama</p>
+                            <p class="text-[10px] font-bold text-sg-sub tracking-wider mb-1.5 uppercase">Nama</p>
                             <p class="text-[13px] font-bold text-sg-text truncate">{{ $pesanan->nama_pelanggan ?? $pesanan->user_id ?? '-' }}</p>
                         </div>
                         <div>

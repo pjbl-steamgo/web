@@ -78,8 +78,8 @@
 
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
     <div>
-      <h2 class="text-xl font-display font-bold text-sg-text">Kelola Layanan & Parameter</h2>
-      <p class="text-sm text-sg-sub mt-1">Konfigurasi harga, slot antrian, dan pantau statistik pesanan bulan ini.</p>
+      <h2 class="text-xl font-display font-bold text-sg-text">Kelola Layanan</h2>
+      <p class="text-sm text-sg-sub mt-1">Kelola harga, jadwal, dan pantau statistik pesanan bulan ini.</p>
     </div>
     
     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
@@ -149,31 +149,35 @@
                   <div class="text-[10px] font-bold text-sg-sub uppercase mb-1">Waktu (Menit)</div>
                   <div class="font-bold text-[14px] text-sg-text">{{ $itemMotor->estimasi_waktu }} Min</div>
                 </div>
-                <div class="bg-white border border-sg-border/60 rounded-xl p-3 shadow-sm">
-                  <div class="text-[10px] font-bold text-sg-sub uppercase mb-1">Slot Tersedia</div>
-                  <div class="font-bold text-[13px] text-sg-text">{{ $itemMotor->slot_tersedia ?? 0 }} Slot</div>
-                </div>
-                <div class="bg-white border border-sg-border/60 rounded-xl p-3 shadow-sm">
-                  <div class="text-[10px] font-bold text-sg-sub uppercase mb-1">Dipesan Bln Ini</div>
+                <div class="col-span-2 bg-white border border-sg-border/60 rounded-xl p-3 shadow-sm flex justify-between items-center">
+                  <div class="text-[10px] font-bold text-sg-sub uppercase">Dipesan Bulan Ini</div>
                   <div class="font-bold text-[13px] text-sg-text"><span class="text-sg-blue">{{ $itemMotor->pesanans_count ?? 0 }}</span> kali</div>
                 </div>
               </div>
 
               <div class="flex gap-2 mt-auto">
                 <button class="flex-1 bg-white border border-sg-border text-sg-sub hover:text-sg-blue hover:border-sg-blue hover:shadow-sm rounded-xl py-2 text-[12px] font-bold transition-all flex items-center justify-center gap-2"
-                        data-id="{{ $itemMotor->id }}" data-nama="{{ $itemMotor->nama_layanan }}" data-kategori="{{ $itemMotor->kategori }}" data-harga="{{ $itemMotor->harga }}" data-estimasi="{{ $itemMotor->estimasi_waktu }}" data-slot="{{ $itemMotor->slot_tersedia ?? 0 }}" data-deskripsi="{{ $itemMotor->deskripsi }}"
+                        data-id="{{ $itemMotor->id }}" 
+                        data-nama="{{ $itemMotor->nama_layanan }}" 
+                        data-kategori="{{ $itemMotor->kategori }}" 
+                        data-harga="{{ $itemMotor->harga }}" 
+                        data-estimasi="{{ $itemMotor->estimasi_waktu }}" 
+                        data-deskripsi="{{ $itemMotor->deskripsi }}"
                         onclick="openEditLayananModal(this)">
                   <i class="bi bi-pencil-square text-sm"></i> Edit Data
                 </button>
                 
                 <button class="w-10 h-10 bg-white border border-sg-border rounded-xl flex items-center justify-center transition-all flex-shrink-0 {{ $isActiveMtr ? 'text-sg-green hover:bg-[#DCFCE7] hover:border-green-300' : 'text-red-500 hover:bg-red-50 hover:border-red-300' }}"
-                        data-url="{{ route('layanan.toggle', $itemMotor->id) }}" data-nama="{{ $itemMotor->nama_layanan }}" data-status="{{ $isActiveMtr ? 'aktif' : 'tidak_aktif' }}"
+                        data-url="{{ route('layanan.toggle', $itemMotor->id) }}" 
+                        data-nama="{{ $itemMotor->nama_layanan }}" 
+                        data-status="{{ $isActiveMtr ? 'aktif' : 'tidak_aktif' }}"
                         onclick="openToggleLayananModal(this)" title="Buka/Tutup">
                   <i class="bi {{ $isActiveMtr ? 'bi-toggle-on' : 'bi-toggle-off' }} text-[20px]"></i>
                 </button>
                 
                 <button class="w-10 h-10 bg-white border border-sg-border text-sg-red hover:bg-red-50 hover:border-red-200 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
-                        data-url="{{ route('layanan.destroy', $itemMotor->id) }}" data-nama="{{ $itemMotor->nama_layanan }}"
+                        data-url="{{ route('layanan.destroy', $itemMotor->id) }}" 
+                        data-nama="{{ $itemMotor->nama_layanan }}"
                         onclick="openDeleteLayananModal(this)" title="Hapus Layanan">
                   <i class="bi bi-trash text-[16px]"></i>
                 </button>
@@ -185,7 +189,7 @@
                   + Tambah Data Motor
                 </button>
               </div>
-            @endif
+            @endforelse
           </div>
 
           @php 
@@ -224,31 +228,35 @@
                   <div class="text-[10px] font-bold text-sg-sub uppercase mb-1">Waktu (Menit)</div>
                   <div class="font-bold text-[14px] text-sg-text">{{ $itemMobil->estimasi_waktu }} Min</div>
                 </div>
-                <div class="bg-white border border-sg-border/60 rounded-xl p-3 shadow-sm">
-                  <div class="text-[10px] font-bold text-sg-sub uppercase mb-1">Slot Tersedia</div>
-                  <div class="font-bold text-[13px] text-sg-text">{{ $itemMobil->slot_tersedia ?? 0 }} Slot</div>
-                </div>
-                <div class="bg-white border border-sg-border/60 rounded-xl p-3 shadow-sm">
-                  <div class="text-[10px] font-bold text-sg-sub uppercase mb-1">Dipesan Bln Ini</div>
+                <div class="col-span-2 bg-white border border-sg-border/60 rounded-xl p-3 shadow-sm flex justify-between items-center">
+                  <div class="text-[10px] font-bold text-sg-sub uppercase">Dipesan Bln Ini</div>
                   <div class="font-bold text-[13px] text-sg-text"><span class="text-sg-blue">{{ $itemMobil->pesanans_count ?? 0 }}</span> kali</div>
                 </div>
               </div>
 
               <div class="flex gap-2 mt-auto">
                 <button class="flex-1 bg-white border border-sg-border text-sg-sub hover:text-sg-blue hover:border-sg-blue hover:shadow-sm rounded-xl py-2 text-[12px] font-bold transition-all flex items-center justify-center gap-2"
-                        data-id="{{ $itemMobil->id }}" data-nama="{{ $itemMobil->nama_layanan }}" data-kategori="{{ $itemMobil->kategori }}" data-harga="{{ $itemMobil->harga }}" data-estimasi="{{ $itemMobil->estimasi_waktu }}" data-slot="{{ $itemMobil->slot_tersedia ?? 0 }}" data-deskripsi="{{ $itemMobil->deskripsi }}"
+                        data-id="{{ $itemMobil->id }}" 
+                        data-nama="{{ $itemMobil->nama_layanan }}" 
+                        data-kategori="{{ $itemMobil->kategori }}" 
+                        data-harga="{{ $itemMobil->harga }}" 
+                        data-estimasi="{{ $itemMobil->estimasi_waktu }}" 
+                        data-deskripsi="{{ $itemMobil->deskripsi }}"
                         onclick="openEditLayananModal(this)">
                   <i class="bi bi-pencil-square text-sm"></i> Edit Data
                 </button>
                 
                 <button class="w-10 h-10 bg-white border border-sg-border rounded-xl flex items-center justify-center transition-all flex-shrink-0 {{ $isActiveMbl ? 'text-sg-green hover:bg-[#DCFCE7] hover:border-green-300' : 'text-red-500 hover:bg-red-50 hover:border-red-300' }}"
-                        data-url="{{ route('layanan.toggle', $itemMobil->id) }}" data-nama="{{ $itemMobil->nama_layanan }}" data-status="{{ $isActiveMbl ? 'aktif' : 'tidak_aktif' }}"
+                        data-url="{{ route('layanan.toggle', $itemMobil->id) }}" 
+                        data-nama="{{ $itemMobil->nama_layanan }}" 
+                        data-status="{{ $isActiveMbl ? 'aktif' : 'tidak_aktif' }}"
                         onclick="openToggleLayananModal(this)" title="Buka/Tutup">
                   <i class="bi {{ $isActiveMbl ? 'bi-toggle-on' : 'bi-toggle-off' }} text-[20px]"></i>
                 </button>
                 
                 <button class="w-10 h-10 bg-white border border-sg-border text-sg-red hover:bg-red-50 hover:border-red-200 rounded-xl flex items-center justify-center transition-all flex-shrink-0"
-                        data-url="{{ route('layanan.destroy', $itemMobil->id) }}" data-nama="{{ $itemMobil->nama_layanan }}"
+                        data-url="{{ route('layanan.destroy', $itemMobil->id) }}" 
+                        data-nama="{{ $itemMobil->nama_layanan }}"
                         onclick="openDeleteLayananModal(this)" title="Hapus Layanan">
                   <i class="bi bi-trash text-[16px]"></i>
                 </button>
@@ -354,7 +362,6 @@
       const kategori = button.getAttribute('data-kategori');
       const harga = button.getAttribute('data-harga');
       const textEstimasi = button.getAttribute('data-estimasi');
-      const slot = button.getAttribute('data-slot'); 
       const deskripsi = button.getAttribute('data-deskripsi');
 
       const form = document.getElementById('form-edit-layanan');
@@ -374,7 +381,6 @@
 
       if(document.getElementById('edit-harga')) document.getElementById('edit-harga').value = harga;
       if(document.getElementById('edit-estimasi')) document.getElementById('edit-estimasi').value = textEstimasi;
-      if(document.getElementById('edit-slot-tersedia')) document.getElementById('edit-slot-tersedia').value = slot; 
       if(document.getElementById('edit-deskripsi')) document.getElementById('edit-deskripsi').value = deskripsi;
 
       openModal('modal-edit-layanan');
@@ -395,7 +401,6 @@
       const submitBtn = document.getElementById('toggle-submit-btn');
 
       if (status === 'aktif') {
-          // LOGIKA SAAT MAU DITUTUP (TAMPILAN MERAH)
           titleEl.innerText = "Tutup Layanan?";
           actionTextEl.innerText = "menutup";
           iconContainer.className = "w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 bg-red-100 text-red-600";
@@ -403,7 +408,6 @@
           submitBtn.className = "bg-red-500 text-white font-semibold rounded-xl px-5 py-2.5 text-sm flex-1 hover:bg-red-600 transition-colors";
           submitBtn.innerText = "Ya, Tutup";
       } else {
-          // LOGIKA SAAT MAU DIBUKA KEMBALI (TAMPILAN HIJAU)
           titleEl.innerText = "Buka Layanan?";
           actionTextEl.innerText = "membuka";
           iconContainer.className = "w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 bg-[#DCFCE7] text-[#16A34A]";

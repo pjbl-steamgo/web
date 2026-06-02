@@ -1,9 +1,4 @@
 <div class="page {{ ($initPage ?? '') === 'pelanggan' ? 'active' : 'hidden' }}" id="page-pelanggan">
-  
-  <div class="mb-6">
-    <h2 class="text-xl font-display font-bold text-sg-text">Manajemen Akun Pelanggan</h2>
-    <p class="text-sm text-sg-sub mt-1">Daftar pelanggan terdaftar dan tingkatan member pelanggan.</p>
-  </div>
 
   @if(session('success'))
     <div class="mb-5 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm">

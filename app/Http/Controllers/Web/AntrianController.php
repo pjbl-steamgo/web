@@ -62,23 +62,28 @@ class AntrianController extends Controller
         $statusLama = $pesanan->status;
         $statusBaru = $request->status;
 
+        // Update status saat ini
         $pesanan->update([
             'status' => $statusBaru
         ]);
 
+        // LOGIKA FIFO: Jika pesanan sebelumnya Proses lalu diubah jadi Selesai/Batal
         if ($statusLama === 'Proses' && in_array($statusBaru, ['Selesai', 'Batal', 'Dihapus'])) {
+            
+            // Cari antrean yang berstatus 'Antri' di JAM OPERASIONAL YANG SAMA PERSIS
+            // Parameter layanan_id dihapus agar jalur antrian bersifat global per jam operasional
             $antreanBerikutnya = Pesanan::where('tanggal', $pesanan->tanggal)
-                ->where('layanan_id', $pesanan->layanan_id)
                 ->where('status', 'Antri')
-                ->orderBy('created_at', 'asc')
+                ->orderBy('created_at', 'asc') // Siapa yang booking duluan, dia yang maju
                 ->first();
 
             if ($antreanBerikutnya) {
+                // Majukan pesanan berikutnya menjadi Proses
                 $antreanBerikutnya->update([
                     'status' => 'Proses'
                 ]);
                 
-                return redirect()->back()->with('success', 'Status berhasil diperbarui! Antrean selanjutnya otomatis naik menjadi Proses.');
+                return redirect()->back()->with('success', 'Status berhasil diperbarui! Antrean selanjutnya di jam ini otomatis naik menjadi Proses.');
             }
         }
 

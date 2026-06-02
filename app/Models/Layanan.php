@@ -14,7 +14,6 @@ class Layanan extends Model
         'nama_layanan',
         'deskripsi',
         'estimasi_waktu',
-        'slot_tersedia',
         'harga',
         'is_active'
     ];

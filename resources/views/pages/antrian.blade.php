@@ -5,7 +5,7 @@
     <div class="grid grid-cols-2 md:flex md:flex-wrap gap-3 w-full lg:w-auto">
       
       <div class="col-span-2 md:col-span-1 relative">
-        <input type="date" id="filter-tanggal" class="w-full bg-white border border-sg-border rounded-xl pl-4 pr-10 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue appearance-none shadow-sm" value="{{ date('Y-m-d') }}" onchange="filterAntrian()">
+        <input type="date" id="filter-tanggal" class="w-full bg-white border border-sg-border rounded-xl pl-4 pr-10 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue appearance-none shadow-sm" value="{{ \Carbon\Carbon::now('Asia/Jakarta')->format('Y-m-d') }}" onchange="filterAntrian()">
       </div>
       
       <select id="filter-status" class="w-full md:w-auto bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue shadow-sm" onchange="filterAntrian()">
@@ -39,7 +39,7 @@
     <div class="flex-1 bg-white border border-sg-border rounded-2xl shadow-sm overflow-hidden flex flex-col w-full lg:h-full">
       
       <div class="px-4 sm:px-6 py-5 border-b border-sg-border flex justify-between items-center bg-white flex-shrink-0">
-        <h3 class="font-bold text-sg-text text-[14px] sm:text-[15px]">Antrian Aktif — <span id="display-tanggal">{{ \Carbon\Carbon::now()->translatedFormat('d M Y') }}</span></h3>
+        <h3 class="font-bold text-sg-text text-[14px] sm:text-[15px]">Antrian Aktif — <span id="display-tanggal">{{ \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('d F Y') }}</span></h3>
         <span class="bg-[#FFF7ED] text-[#F97316] text-[11px] font-bold px-3 py-1 rounded-full whitespace-nowrap"><span id="count-antrian">{{ count($antrians ?? []) }}</span> Antrian</span>
       </div>
 
@@ -59,11 +59,44 @@
             
             @forelse ($antrians ?? [] as $index => $antrian)
               @php
-                  $status = strtolower($antrian->status);
+                  $status = strtolower($antrian->status ?? '');
                   $isProses = $status === 'proses';
                   $kategori = strtolower($antrian->layanan->kategori ?? '');
                   $layananId = $antrian->layanan_id ?? '';
-                  $tanggalOnly = \Carbon\Carbon::parse($antrian->tanggal)->format('Y-m-d');
+                  
+                  $rawTanggal = trim($antrian->tanggal ?? '');
+                  $tanggalOnly = \Carbon\Carbon::now('Asia/Jakarta')->format('Y-m-d');
+                  $jamOnly = '00:00';
+
+                  // PERBAIKAN 3: Menggunakan Regex (Pendeteksi Pola Teks) agar 100% Kebal Error
+                  // Mendeteksi pola "02 Juni 2026, 16:00..."
+                  $pattern = '/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4}),\s+(\d{2}:\d{2})/';
+                  
+                  if (preg_match($pattern, $rawTanggal, $matches)) {
+                      $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+                      $monthIndo = strtolower($matches[2]);
+                      $year = $matches[3];
+                      $jamOnly = $matches[4];
+
+                      // Kamus translasi bulan bahasa Indonesia -> Angka
+                      $months = [
+                          'januari' => '01', 'februari' => '02', 'maret' => '03', 
+                          'april' => '04', 'mei' => '05', 'juni' => '06', 
+                          'juli' => '07', 'agustus' => '08', 'september' => '09', 
+                          'oktober' => '10', 'november' => '11', 'desember' => '12'
+                      ];
+                      $monthNum = $months[$monthIndo] ?? '01';
+                      
+                      // Hasilnya pasti murni format '2026-06-02'
+                      $tanggalOnly = "$year-$monthNum-$day";
+                  } else {
+                      // Fallback: Jika database ternyata menyimpan format Date() standar
+                      try {
+                          $parsed = \Carbon\Carbon::parse($rawTanggal);
+                          $tanggalOnly = $parsed->format('Y-m-d');
+                          $jamOnly = $parsed->format('H:i');
+                      } catch (\Exception $e) {}
+                  }
               @endphp
               
               <tr class="hover:bg-gray-50 transition-colors antrian-row-desktop" 
@@ -87,7 +120,7 @@
                 </td>
                 
                 <td class="px-6 py-4 whitespace-nowrap text-[13px] text-sg-text font-medium">
-                  {{ \Carbon\Carbon::parse($antrian->tanggal)->format('H:i') }}
+                  {{ $jamOnly }}
                 </td>
                 
                 <td class="px-6 py-4 whitespace-nowrap">
@@ -133,11 +166,38 @@
       <div class="block lg:hidden flex-grow divide-y divide-sg-border bg-gray-50/50">
         @forelse ($antrians ?? [] as $index => $antrian)
           @php
-              $status = strtolower($antrian->status);
+              $status = strtolower($antrian->status ?? '');
               $isProses = $status === 'proses';
               $kategori = strtolower($antrian->layanan->kategori ?? '');
               $layananId = $antrian->layanan_id ?? '';
-              $tanggalOnly = \Carbon\Carbon::parse($antrian->tanggal)->format('Y-m-d');
+              
+              $rawTanggal = trim($antrian->tanggal ?? '');
+              $tanggalOnly = \Carbon\Carbon::now('Asia/Jakarta')->format('Y-m-d');
+              $jamOnly = '00:00';
+
+              // LOGIKA REGEX SAMA DENGAN DESKTOP
+              $pattern = '/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4}),\s+(\d{2}:\d{2})/';
+              if (preg_match($pattern, $rawTanggal, $matches)) {
+                  $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+                  $monthIndo = strtolower($matches[2]);
+                  $year = $matches[3];
+                  $jamOnly = $matches[4];
+
+                  $months = [
+                      'januari' => '01', 'februari' => '02', 'maret' => '03', 
+                      'april' => '04', 'mei' => '05', 'juni' => '06', 
+                      'juli' => '07', 'agustus' => '08', 'september' => '09', 
+                      'oktober' => '10', 'november' => '11', 'desember' => '12'
+                  ];
+                  $monthNum = $months[$monthIndo] ?? '01';
+                  $tanggalOnly = "$year-$monthNum-$day";
+              } else {
+                  try {
+                      $parsed = \Carbon\Carbon::parse($rawTanggal);
+                      $tanggalOnly = $parsed->format('Y-m-d');
+                      $jamOnly = $parsed->format('H:i');
+                  } catch (\Exception $e) {}
+              }
           @endphp
           
           <div class="p-4 bg-white antrian-row-mobile"
@@ -166,7 +226,7 @@
 
             <div class="flex justify-between items-center bg-[#FAFBFD] p-3 rounded-xl border border-sg-border/50 mb-3">
               <span class="text-[12px] text-sg-sub font-medium">Jam Kedatangan</span>
-              <span class="font-bold text-[13px] text-sg-text"><i class="bi bi-clock mr-1 text-sg-sub"></i> {{ \Carbon\Carbon::parse($antrian->tanggal)->format('H:i') }}</span>
+              <span class="font-bold text-[13px] text-sg-text"><i class="bi bi-clock mr-1 text-sg-sub"></i> {{ $jamOnly }}</span>
             </div>
 
             <div class="flex w-full">
@@ -289,9 +349,6 @@
 </div>
 
 <script>
-  // ===============================
-  // FUNGSI FILTER ANTRIAN (DESKTOP & MOBILE)
-  // ===============================
   function filterAntrian() {
     const valTanggal = document.getElementById('filter-tanggal').value;
     const valStatus = document.getElementById('filter-status').value;
@@ -344,9 +401,6 @@
     }
   }
 
-  // ===============================
-  // FUNGSI DOM MANIPULASI JAM
-  // ===============================
   function setJamIndividuState(btn, targetStatus) {
     const icon = btn.querySelector('i');
     const card = btn.closest('.jam-card');
@@ -388,9 +442,6 @@
     }
   }
 
-  // ===============================
-  // FUNGSI TOGGLE JAM (INDIVIDU)
-  // ===============================
   let currentToggleBtn = null;
 
   function openToggleJamModal(btn) {
@@ -456,9 +507,6 @@
     closeModal();
   }
 
-  // ===============================
-  // FUNGSI TOGGLE JAM (MASTER SEMUA)
-  // ===============================
   function openToggleSemuaJamModal(btn) {
     const status = btn.getAttribute('data-status');
 

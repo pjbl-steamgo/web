@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pesanan;
+use App\Models\User;
+use App\Models\Layanan;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -45,12 +48,12 @@ class OrderController extends Controller
 
     public function getServices()
     {
-        $layanan = \App\Models\Layanan::all();
+        $layanan = Layanan::all();
         return response()->json(['success' => true, 'data' => $layanan], 200);
     }
 
     // ---------------------------------------------------------
-    // FUNGSI MEMBUAT PESANAN (SUDAH DIPERBAIKI SESUAI MONGODB)
+    // FUNGSI MEMBUAT PESANAN (TANPA LIMIT SLOT OTOMATIS)
     // ---------------------------------------------------------
     public function store(Request $request)
     {
@@ -65,10 +68,10 @@ class OrderController extends Controller
 
         $userId = $request->user_id;
 
-        // 1. CARI USER BERDASARKAN Kolom `id_user` (contoh: USR-20A121) ATAU `_id` MongoDB
-        $user = \App\Models\User::where('id_user', $userId)
-                                ->orWhere('_id', $userId)
-                                ->first();
+        // 1. CARI USER BERDASARKAN Kolom `id_user` ATAU `_id` MongoDB
+        $user = User::where('id_user', $userId)
+                    ->orWhere('_id', $userId)
+                    ->first();
 
         // Jika tetap tidak ketemu, tolak pesanan dan beri pesan error jelas ke Flutter
         if (!$user) {
@@ -78,11 +81,11 @@ class OrderController extends Controller
             ], 404);
         }
 
-        // 2. SIMPAN PESANAN JIKA USER DITEMUKAN
+        // 2. SIMPAN PESANAN (Status Tetap: Belum Dikonfirmasi untuk alur pembayaran)
         $pesanan = new Pesanan();
         $pesanan->kode_pesanan      = 'STG-' . strtoupper(substr(uniqid(), -6));
         
-        // AMBIL DATA DARI TABEL USERS (Sesuai struktur database)
+        // AMBIL DATA DARI TABEL USERS
         $pesanan->nama_pelanggan    = $user->username ?? 'Pelanggan'; 
         $pesanan->no_hp             = $user->no_hp ?? '-';
         $pesanan->metode_pembayaran = 'QRIS';
@@ -92,9 +95,10 @@ class OrderController extends Controller
         $pesanan->layanan_id        = $request->layanan_id;
         $pesanan->kendaraan         = $request->kendaraan;
         $pesanan->plat_nomor        = strtoupper($request->plat_nomor);
-        $pesanan->tanggal           = $request->tanggal;
+        $pesanan->tanggal           = $request->tanggal; // cth: "02 Juni 2026, 13:00 - 14:00"
         $pesanan->total_harga       = (int) $request->total_harga;
         
+        // Status awal WAJIB Belum Dikonfirmasi agar bisa upload pembayaran di Flutter
         $pesanan->status            = 'Belum Dikonfirmasi'; 
         $pesanan->no_antrian        = '-'; 
         
@@ -109,7 +113,7 @@ class OrderController extends Controller
 
     public function checkStatus($id)
     {
-        $pesanan = \App\Models\Pesanan::find($id);
+        $pesanan = Pesanan::find($id);
 
         if (!$pesanan) {
             return response()->json([
@@ -122,7 +126,7 @@ class OrderController extends Controller
         $sisaDetik = 0;
 
         if ($pesanan->status === 'Belum Bayar') {
-            $waktuDisetujui = \Carbon\Carbon::parse($pesanan->updated_at);
+            $waktuDisetujui = Carbon::parse($pesanan->updated_at);
             $batasWaktu = $waktuDisetujui->addMinutes(10);
             
             if (now()->greaterThanOrEqualTo($batasWaktu)) {
@@ -151,7 +155,7 @@ class OrderController extends Controller
             'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:5120', // Maksimal 5MB
         ]);
 
-        $pesanan = \App\Models\Pesanan::find($id);
+        $pesanan = Pesanan::find($id);
 
         if (!$pesanan) {
             return response()->json(['success' => false, 'message' => 'Pesanan tidak ditemukan.'], 404);
@@ -161,7 +165,6 @@ class OrderController extends Controller
         if ($request->hasFile('bukti_pembayaran')) {
             $file = $request->file('bukti_pembayaran');
             $filename = time() . '_' . $file->getClientOriginalName();
-            // Pastikan folder storage/app/public/payments sudah ditautkan dengan php artisan storage:link
             $path = $file->storeAs('payments', $filename, 'public'); 
             
             $pesanan->bukti_pembayaran = '/storage/' . $path;

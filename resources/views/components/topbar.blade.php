@@ -5,35 +5,58 @@
   
   <div>
     <span class="font-display text-[17px] font-bold" id="topbar-title">
-      @if(($initPage ?? 'dashboard') === 'antrian')
+      @if(($initPage ?? 'dashboard') === 'dashboard')
+        Dashboard
+      @elseif($initPage === 'antrian-jadwal')
         Antrian & Jadwal
-      @elseif(($initPage ?? '') === 'pesanan')
+      @elseif($initPage === 'pesanan')
         Kelola Pesanan
-      @elseif(($initPage ?? '') === 'layanan')
+      @elseif($initPage === 'konfirmasi-booking')
+        Kelola Booking
+      @elseif($initPage === 'konfirmasi-pembayaran')
+        Kelola Pembayaran
+      @elseif($initPage === 'layanan')
         Layanan & Harga
-      @elseif(($initPage ?? '') === 'pelanggan')
+      @elseif($initPage === 'pelanggan')
         Data Pelanggan
-      @elseif(($initPage ?? '') === 'laporan')
+      @elseif($initPage === 'laporan')
         Laporan Pendapatan
-      @elseif(($initPage ?? '') === 'chat')
+      @elseif($initPage === 'chat')
         Pesan Pelanggan
-      @elseif(($initPage ?? '') === 'pengaturan')
+      @elseif($initPage === 'pengaturan')
         Pengaturan Usaha
       @else
         Dashboard
       @endif
     </span>
-    <span class="text-xs text-sg-sub ml-1" id="topbar-sub">Selamat datang, Admin!</span>
+    <span class="text-xs text-sg-sub ml-1" id="topbar-sub">
+      @if(($initPage ?? 'dashboard') === 'dashboard')
+        Selamat datang kembali, {{ Auth::user()->username ?? 'Admin' }}!
+      @elseif($initPage === 'antrian-jadwal')
+        Pantau dan kelola antrean kendaraan.
+      @elseif($initPage === 'pesanan')
+        Lihat semua riwayat pesanan masuk.
+      @elseif($initPage === 'konfirmasi-booking')
+        Setujui atau tolak booking dari pelanggan.
+      @elseif($initPage === 'konfirmasi-pembayaran')
+        Verifikasi bukti pembayaran pelanggan.
+      @elseif($initPage === 'layanan')
+        Atur paket layanan dan harga cuci.
+      @elseif($initPage === 'pelanggan')
+        Daftar akun dan tier member pelanggan.
+      @elseif($initPage === 'laporan')
+        Ringkasan pendapatan dan statistik usaha.
+      @elseif($initPage === 'chat')
+        Balas pesan dan pertanyaan pelanggan.
+      @elseif($initPage === 'pengaturan')
+        Konfigurasi informasi dan profil usaha.
+      @else
+        Selamat datang kembali, {{ Auth::user()->username ?? 'Admin' }}!
+      @endif
+    </span>
   </div>
   
   <div class="ml-auto flex items-center gap-2">
-    <div class="hidden md:flex items-center gap-2 bg-sg-bg border border-sg-border rounded-xl px-3.5 py-2 text-[13px] text-sg-sub cursor-pointer hover:border-sg-blue transition-colors" onclick="openTopbarSearch()">
-      <i class="bi bi-search"></i> Cari pesanan...
-    </div>
-    <div class="w-[38px] h-[38px] bg-sg-bg border border-sg-border rounded-xl flex items-center justify-center text-lg cursor-pointer relative">
-      <i class="bi bi-bell"></i>
-      <div class="absolute top-2 right-2 w-[7px] h-[7px] bg-sg-red rounded-full border-2 border-white"></div>
-    </div>
     <div class="hidden lg:block text-[13px] text-sg-sub font-medium" id="tb-date"></div>
   </div>
 </div>

@@ -44,16 +44,26 @@
                 $namaPelanggan = $u ? ($u->username ?? $u->nama ?? 'Pelanggan') : 'User ' . substr($uid, -4);
                 $color = $colors[$idx % 4];
                 $ava = strtoupper(substr($namaPelanggan, 0, 1));
-                
+                $fotoProfil = $u?->foto_profil ?? null;
+
                 $lastMsg = \App\Models\Chat::where('user_id', $uid)->orderBy('created_at', 'desc')->first();
                 $time = $lastMsg ? \Carbon\Carbon::parse($lastMsg->created_at)->timezone('Asia/Jakarta')->format('H:i') : '';
                 $preview = $lastMsg ? (empty($lastMsg->message) && $lastMsg->image ? '📷 Mengirim Gambar' : $lastMsg->message) : 'Belum ada pesan';
             @endphp
-            <div class="chat-contact cursor-pointer border-b border-sg-border/50 hover:bg-[#F8FAFC] transition-colors" data-userid="{{ $uid }}" onclick="openChat(this, '{{ $uid }}', '{{ $namaPelanggan }}', '{{ $time }}', '{{ $ava }}', '{{ $color }}')">
+            <div class="chat-contact cursor-pointer border-b border-sg-border/50 hover:bg-[#F8FAFC] transition-colors"
+                 data-userid="{{ $uid }}"
+                 data-foto="{{ $fotoProfil ? asset('storage/' . $fotoProfil) : '' }}"
+                 onclick="openChat(this, '{{ $uid }}', '{{ $namaPelanggan }}', '{{ $time }}', '{{ $ava }}', '{{ $color }}')">
               <div class="p-3 flex items-center gap-3">
-                <div class="cc-avatar {{ $color }} w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0">{{ $ava }}</div>
+                {{-- Avatar: foto profil jika ada, fallback huruf --}}
+                @if($fotoProfil)
+                  <img src="{{ asset('storage/' . $fotoProfil) }}"
+                       alt="{{ $namaPelanggan }}"
+                       class="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-sg-border">
+                @else
+                  <div class="cc-avatar {{ $color }} w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0">{{ $ava }}</div>
+                @endif
                 <div class="cc-info flex-1 min-w-0">
-                  <!-- PERBAIKAN: Flex-1 dan flex-shrink-0 serta gap-2 agar nama dan jam tidak berdempetan -->
                   <div class="flex justify-between items-center mb-0.5 gap-2">
                     <div class="cc-name font-bold text-[14px] text-sg-text truncate flex-1">{{ $namaPelanggan }}</div>
                     <div class="cc-time text-[11px] text-sg-sub flex-shrink-0 whitespace-nowrap">{{ $time }}</div>
@@ -82,7 +92,7 @@
         <button class="lg:hidden text-sg-text hover:text-sg-blue mr-1 flex items-center justify-center w-8 h-8 rounded-lg hover:bg-sg-bg transition-colors" onclick="closeChat()">
           <i class="bi bi-arrow-left text-lg"></i>
         </button>
-        <div class="w-10 h-10 rounded-xl bg-sg-blue flex items-center justify-center text-lg font-bold text-white flex-shrink-0 shadow-sm" id="cw-avatar"></div>
+        <div class="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center text-lg font-bold text-white flex-shrink-0 shadow-sm bg-sg-blue" id="cw-avatar"></div>
         <div class="flex-grow min-w-0">
           <div class="font-bold text-[14px] md:text-[15px] truncate text-sg-text" id="cw-name"></div>
           <div class="text-[11px] font-semibold text-sg-green flex items-center gap-1 mt-0.5">
@@ -124,8 +134,6 @@
            <button type="button" onclick="cancelImage()" class="text-red-400 hover:text-red-600 text-xs flex items-center gap-1"><i class="bi bi-x-circle-fill"></i> Batal</button>
         </div>
         
-        <!-- PERBAIKAN: Tombol Balasan Cepat Sudah Dihapus Sesuai Permintaan -->
-        
         <div class="p-3 md:p-4 flex items-end gap-2 md:gap-3">
           <div class="flex-1 bg-[#F8FAFC] border border-sg-border rounded-xl px-3 md:px-4 py-2 flex items-end gap-2 focus-within:border-sg-blue focus-within:bg-white focus-within:ring-1 focus-within:ring-sg-blue transition-all shadow-inner">
             <textarea id="chat-textarea" class="chat-textarea flex-1 bg-transparent border-none text-[13px] text-sg-text placeholder-sg-sub py-1.5 max-h-24 overflow-y-auto hide-scrollbar focus:outline-none" placeholder="Ketik balasan untuk pelanggan..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"></textarea>
@@ -166,10 +174,18 @@
       document.getElementById('chat-input-section').classList.add('flex');
 
       document.getElementById('cw-name').textContent = name;
+
+      // ── Update avatar header: foto profil atau fallback huruf ──
       let avatarEl = document.getElementById('cw-avatar');
-      if(avatarEl) {
-        avatarEl.textContent = avatarText;
-        avatarEl.className = `w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0 shadow-sm ${avatarColor}`;
+      const fotoUrl = element ? element.dataset.foto : '';
+      if (avatarEl) {
+          if (fotoUrl) {
+              avatarEl.innerHTML = `<img src="${fotoUrl}" class="w-full h-full object-cover rounded-xl">`;
+              avatarEl.className = `w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 shadow-sm`;
+          } else {
+              avatarEl.innerHTML = avatarText;
+              avatarEl.className = `w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0 shadow-sm ${avatarColor}`;
+          }
       }
 
       document.querySelectorAll('.chat-contact').forEach(el => el.classList.remove('active', 'bg-[#E8F0FE]', 'border-l-4', 'border-l-sg-blue'));
@@ -229,6 +245,31 @@
         }
     }
 
+    // ── TANDAI PERCAKAPAN SELESAI — PESAN DI DB TIDAK DIHAPUS ──
+    function markResolved() {
+        if (!activeUserId) return;
+
+        if (!confirm('Tandai percakapan ini sebagai selesai? Riwayat pesan di sisi pelanggan akan dihapus secara otomatis.')) return;
+
+        fetch(`/api/admin/chat/${activeUserId}/resolve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? ''
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Hapus kontak dari sidebar (UI saja), data di DB tetap aman
+                const contactEl = document.querySelector(`.chat-contact[data-userid="${activeUserId}"]`);
+                if (contactEl) contactEl.remove();
+                closeChat();
+            }
+        })
+        .catch(() => alert('Gagal menandai selesai. Coba lagi.'));
+    }
+
     function fetchMessages() {
         if (!activeUserId) return;
         
@@ -259,8 +300,6 @@
                         let formattedMsg = msg.message ? msg.message.replace(/\n/g, '<br>') : '';
                         let textHtml = formattedMsg ? `<div class="whitespace-pre-wrap">${formattedMsg}</div>` : '';
 
-                        // PERBAIKAN: Padding diperkecil (px-3 py-2) dan Teks diperkecil (text-[12px] md:text-[13px]) 
-                        // Serta margin bottom (mb-2) agar riwayat bisa muat lebih banyak
                         if (msg.sender === 'admin') {
                             tempHTML += `
                             <div class="w-full flex justify-end mb-2 pr-1 group" style="animation: fadeIn 0.3s ease;">

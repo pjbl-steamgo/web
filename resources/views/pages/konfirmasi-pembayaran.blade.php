@@ -1,9 +1,5 @@
 <div class="w-full">
     <div class="mb-6 flex justify-between items-end">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-900">Konfirmasi Pembayaran</h2>
-            <p class="text-gray-500 text-sm mt-1">Periksa bukti transfer pelanggan dan validasi pembayaran untuk masuk ke antrean cuci.</p>
-        </div>
         
         <div class="hidden md:flex items-center bg-white border border-gray-300 rounded-lg px-4 py-2 shadow-sm cursor-pointer hover:bg-gray-50">
             <span class="text-sm font-bold text-gray-800">Urutkan: Terlama (Prioritas)</span>
@@ -36,15 +32,14 @@
                             {{ strtoupper(substr($pesanan->nama_pelanggan ?? 'U', 0, 1)) }}
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-gray-800">
-                                Kode Pesanan : <span class="font-bold text-black">{{ $pesanan->kode_pesanan ?? '-' }}</span>
-                            </p>
+                            <p class="text-[12px] font-bold text-sg-sub uppercase tracking-wider">Kode Pesanan</p>
+                            <p class="text-lg font-bold text-sg-text">{{ $pesanan->kode_pesanan ?? '-' }}</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-y-6 gap-x-4 mb-8">
                         <div>
-                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">ID User / Nama</p>
+                            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-1.5 uppercase">Nama</p>
                             <p class="text-sm font-bold text-gray-900 truncate">{{ $pesanan->nama_pelanggan ?? $pesanan->user_id ?? '-' }}</p>
                         </div>
                         <div>

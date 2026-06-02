@@ -40,10 +40,6 @@
             @include('pages.chat')
             @break
 
-        @case('pengaturan')
-            @include('pages.pengaturan')
-            @break
-
         @default
             @include('pages.dashboard')
     @endswitch

@@ -17,7 +17,7 @@ class PelangganController extends Controller
     public function index()
     {
         // 1. Mengambil semua user dengan urutan pendaftaran terbaru
-        $pelanggans = User::orderBy('created_at', 'desc')->get();
+        $pelanggans = User::where('role', 'user')->orderBy('created_at', 'desc')->get();
 
         // 2. Loop untuk menghitung jumlah pesanan tiap pelanggan
         foreach ($pelanggans as $pelanggan) {

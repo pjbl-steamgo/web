@@ -17,7 +17,8 @@
 <div id="modal-tambah-layanan" class="modal-panel hidden fixed z-[2001] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-2xl">
   
   <form action="{{ route('layanan.store') }}" method="POST">
-    @csrf <div class="flex items-center justify-between px-6 py-4 border-b border-sg-border">
+    @csrf 
+    <div class="flex items-center justify-between px-6 py-4 border-b border-sg-border">
       <h5 class="font-display font-bold text-[17px]">Tambah Layanan Baru</h5>
       <button type="button" class="text-sg-sub hover:text-sg-text" onclick="closeModal()">✕</button>
     </div>
@@ -28,7 +29,7 @@
         <input name="nama_layanan" class="w-full bg-sg-bg border border-sg-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-sg-blue" placeholder="Cth: Snow Wash Motor" required>
       </div>
       
-      <div>
+      <div class="col-span-2">
         <label class="block text-[11px] font-bold text-sg-sub uppercase tracking-wide mb-1">Kategori</label>
         <select name="kategori" class="w-full bg-sg-bg border border-sg-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-sg-blue" required>
           <option value="Motor">Motor</option>
@@ -44,11 +45,6 @@
       <div>
         <label class="block text-[11px] font-bold text-sg-sub uppercase tracking-wide mb-1">Estimasi (menit)</label>
         <input type="number" name="estimasi_waktu" class="w-full bg-sg-bg border border-sg-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-sg-blue" placeholder="30" required>
-      </div>
-
-      <div class="mb-4">
-        <label class="block text-xs font-bold text-sg-sub uppercase tracking-wide mb-2">Slot Tersedia</label>
-        <input type="number" name="slot_tersedia" id="edit-slot-tersedia" class="w-full bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue focus:ring-1 focus:ring-sg-blue transition-all" placeholder="Contoh: 5" required>
       </div>
       
       <div class="col-span-2">
@@ -93,7 +89,7 @@
         </select>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         
         <div>
           <label class="block text-xs font-bold text-sg-sub uppercase tracking-wide mb-2">Harga (Rp)</label>
@@ -105,11 +101,6 @@
           <input type="number" name="estimasi_waktu" id="edit-estimasi" class="w-full bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue focus:ring-1 focus:ring-sg-blue transition-all" required>
         </div>
         
-        <div>
-          <label class="block text-xs font-bold text-sg-sub uppercase tracking-wide mb-2">Slot Tersedia</label>
-          <input type="number" name="slot_tersedia" id="edit-slot-tersedia" class="w-full bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue focus:ring-1 focus:ring-sg-blue transition-all" placeholder="Contoh: 5" required>
-        </div>
-
       </div>
 
       <div>

@@ -9,3 +9,12 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer components {
+    /* Style untuk grafik batang pendapatan di dashboard */
+    .bar {
+        border-radius: 6px 6px 0 0;
+        transition: height 0.5s ease-in-out;
+        min-height: 4px;
+    }
+}
