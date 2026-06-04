@@ -14,7 +14,6 @@
 
   <div class="bg-white rounded-2xl border border-sg-border shadow-sm flex flex-col lg:flex-row overflow-hidden w-full chat-container" id="chat-container" style="height:calc(100vh - 110px);">
 
-    <!-- ── SIDEBAR KONTAK ── -->
     <div class="w-full lg:w-[320px] h-full flex flex-col border-b lg:border-b-0 lg:border-r border-sg-border flex-shrink-0 bg-[#FAFBFD] min-h-0" id="chat-sidebar">
       <div class="px-5 py-4 border-b border-sg-border flex items-center justify-between flex-shrink-0">
         <span class="font-display font-bold text-[15px]">💬 Pesan Masuk</span>
@@ -29,7 +28,10 @@
       <div class="flex-1 overflow-y-auto bg-white min-h-0" id="chat-contacts">
         @php
             $requestedUser = request('user');
-            $userIds = \App\Models\Chat::pluck('user_id')->unique()->filter()->values()->toArray();
+            
+            // PERBAIKAN: Tambahkan where('is_resolved', false) agar chat yang selesai tidak muncul lagi
+            $userIds = \App\Models\Chat::where('is_resolved', false)->pluck('user_id')->unique()->filter()->values()->toArray();
+            
             if (!empty($requestedUser) && !in_array($requestedUser, $userIds)) array_unshift($userIds, $requestedUser);
 
             $usersData = \App\Models\User::whereIn('id_user', $userIds)->orWhereIn('_id', $userIds)->get()->keyBy(function($item) {
@@ -80,7 +82,6 @@
       </div>
     </div>
 
-    <!-- ── JENDELA RUANG OBROLAN ── -->
     <div class="flex-1 flex flex-col overflow-hidden relative bg-[#F7F9FD] min-h-0" id="chat-window">
 
       <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 text-sg-sub bg-white z-10" id="chat-empty">
@@ -110,13 +111,10 @@
         </div>
       </div>
 
-      <!-- AREA BUBBLE CHAT -->
       <div class="flex-1 overflow-y-auto p-4 md:p-6 flex-col gap-2 hidden z-20 min-h-0" id="chat-msgs"></div>
 
-      <!-- AREA FORM INPUT -->
       <div id="chat-input-section" class="hidden flex-col bg-white border-t border-sg-border z-20 flex-shrink-0">
         
-        <!-- BANNER REPLY -->
         <div id="reply-banner" class="hidden bg-sg-bg/50 px-4 py-2 text-xs text-sg-sub flex justify-between items-center border-b border-sg-border/50">
           <div class="flex items-center gap-2 truncate">
             <i class="bi bi-reply-fill text-sg-blue"></i>
@@ -125,7 +123,6 @@
           <button type="button" onclick="cancelReply()" class="text-red-400 hover:text-red-600 ml-2"><i class="bi bi-x-circle-fill"></i></button>
         </div>
 
-        <!-- BANNER IMAGE PREVIEW -->
         <div id="image-preview-banner" class="hidden bg-sg-bg/50 px-4 py-2 flex justify-between items-center border-b border-sg-border/50">
            <div class="flex items-center gap-2 text-xs text-sg-text font-semibold">
                <i class="bi bi-image text-sg-blue"></i>
@@ -175,7 +172,7 @@
 
       document.getElementById('cw-name').textContent = name;
 
-      // ── Update avatar header: foto profil atau fallback huruf ──
+      // Update avatar header
       let avatarEl = document.getElementById('cw-avatar');
       const fotoUrl = element ? element.dataset.foto : '';
       if (avatarEl) {
@@ -245,10 +242,8 @@
         }
     }
 
-    // ── TANDAI PERCAKAPAN SELESAI — PESAN DI DB TIDAK DIHAPUS ──
     function markResolved() {
         if (!activeUserId) return;
-
         if (!confirm('Tandai percakapan ini sebagai selesai? Riwayat pesan di sisi pelanggan akan dihapus secara otomatis.')) return;
 
         fetch(`/api/admin/chat/${activeUserId}/resolve`, {
@@ -261,7 +256,6 @@
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                // Hapus kontak dari sidebar (UI saja), data di DB tetap aman
                 const contactEl = document.querySelector(`.chat-contact[data-userid="${activeUserId}"]`);
                 if (contactEl) contactEl.remove();
                 closeChat();
@@ -393,6 +387,50 @@
       });
     }
 
+    // ── FITUR BARU: Cari / Filter Pelanggan Berdasarkan Input Text ──
+    document.getElementById('chat-search')?.addEventListener('input', function(e) {
+        const keyword = e.target.value.toLowerCase();
+        document.querySelectorAll('.chat-contact').forEach(el => {
+            const name = el.querySelector('.cc-name')?.textContent.toLowerCase() || '';
+            el.style.display = name.includes(keyword) ? '' : 'none';
+        });
+    });
+
+    // ── FITUR BARU: Update Sidebar Otomatis di Latar Belakang ──
+    function refreshSidebar() {
+        const searchInput = document.getElementById('chat-search');
+        
+        // Jangan auto-refresh sidebar jika admin sedang menggunakan fitur pencarian
+        if (searchInput && searchInput.value.trim() !== '') return;
+
+        // Ambil URL dengan query aktif agar user yang terpilih tidak tertutup
+        const currentUrl = window.location.href;
+        
+        fetch(currentUrl)
+            .then(res => res.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+                const newContacts = doc.getElementById('chat-contacts');
+                const oldContacts = document.getElementById('chat-contacts');
+                
+                if (newContacts && oldContacts) {
+                    // Menyimpan posisi scroll agar tidak melompat ke atas secara tiba-tiba
+                    const scrollPos = oldContacts.scrollTop;
+                    oldContacts.innerHTML = newContacts.innerHTML;
+                    oldContacts.scrollTop = scrollPos;
+                    
+                    // Mengembalikan highlight aktif ke user yang sedang dibuka pesannya
+                    if (activeUserId) {
+                        document.querySelectorAll('.chat-contact').forEach(el => el.classList.remove('active', 'bg-[#E8F0FE]', 'border-l-4', 'border-l-sg-blue'));
+                        const activeContact = document.querySelector(`.chat-contact[data-userid="${activeUserId}"]`);
+                        if (activeContact) activeContact.classList.add('active', 'bg-[#E8F0FE]', 'border-l-4', 'border-l-sg-blue');
+                    }
+                }
+            })
+            .catch(err => console.log('Gagal memperbarui sidebar', err));
+    }
+
     setTimeout(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const targetUserId = urlParams.get('user');
@@ -402,14 +440,21 @@
         }
     }, 200);
 
+    // ── PERBAIKAN: Interval Polling (Ruang Obrolan & Daftar Sidebar) ──
     setInterval(() => {
+        // 1. Jalankan auto-refresh daftar kontak terbaru di sidebar (kiri)
+        refreshSidebar();
+
+        // 2. Jalankan auto-refresh isi pesan (kanan) HANYA jika ada chat yang sedang dibuka
         if(activeUserId) {
             const textarea = document.getElementById('chat-textarea');
             const fileInput = document.getElementById('chat-image-input');
+            
+            // Jeda pengambilan pesan baru dari server saat admin sedang mengetik/melampirkan foto
             if ((!textarea || textarea.value.trim() === "") && !fileInput.files.length) {
                 fetchMessages();
             }
         }
-    }, 3000);
+    }, 3000); // Polling berjalan setiap 3 detik
   </script>
 </div>

@@ -9,11 +9,10 @@ use App\Models\User;
 
 class ChatAdminController extends Controller
 {
-    // Menampilkan daftar user yang pernah chat & isi chatnya
     public function index(Request $request)
     {
-        // Mengambil daftar user unik yang pernah ngechat
-        $userIds = Chat::distinct('user_id')->get()->pluck('user_id');
+        // PERBAIKAN: Hanya mengambil daftar user yang memiliki chat aktif (belum di-resolve)
+        $userIds = Chat::where('is_resolved', false)->distinct('user_id')->get()->pluck('user_id');
         $users = User::whereIn('id_user', $userIds)->get();
 
         // Jika admin memilih salah satu user dari daftar
@@ -26,11 +25,6 @@ class ChatAdminController extends Controller
             Chat::where('user_id', $activeUser)->where('sender', 'user')->update(['is_read' => true]);
         }
 
-        // ==============================================================
-        // PERBAIKAN UTAMA: 
-        // Wajib return ke 'index', BUKAN 'pages.chat'.
-        // Dan wajib mengirimkan 'initPage' => 'chat' agar CSS termuat!
-        // ==============================================================
         return view('index', [ 
             'initPage'   => 'chat',
             'users'      => $users,
@@ -43,6 +37,9 @@ class ChatAdminController extends Controller
     public function reply(Request $request, $user_id)
     {
         $request->validate(['message' => 'required|string']);
+
+        // PERBAIKAN: Buka kembali semua riwayat chat (unresolve)
+        Chat::where('user_id', $user_id)->update(['is_resolved' => false]);
 
         Chat::create([
             'user_id' => $user_id,

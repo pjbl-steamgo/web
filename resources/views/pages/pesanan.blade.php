@@ -27,7 +27,15 @@
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="font-bold text-sg-text text-[14px]">{{ $pesanan->kode_pesanan }}</div>
                 <div class="text-[12px] text-sg-sub mt-0.5">
-                  {{ date('d M Y, H:i', strtotime($pesanan->tanggal)) }}
+                  @php
+                    $tgl = $pesanan->tanggal ?? '';
+                    $tglOnly = explode(',', $tgl)[0];
+                    $bulanId = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+                    $bulanEn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                    $tglEn = str_replace($bulanId, $bulanEn, $tglOnly);
+                    $formatted = strtotime($tglEn) ? date('d M Y', strtotime($tglEn)) : $tglOnly;
+                  @endphp
+                  {{ $formatted }}
                 </div>
               </td>
               
@@ -120,7 +128,17 @@
           <div class="flex justify-between items-center mb-3">
             <div>
               <div class="font-bold text-sg-text text-[15px]">{{ $pesanan->kode_pesanan }}</div>
-              <div class="text-[11px] text-sg-sub">{{ date('d M Y, H:i', strtotime($pesanan->tanggal)) }}</div>
+              <div class="text-[11px] text-sg-sub">
+                @php
+                  $tgl = $pesanan->tanggal ?? '';
+                  $tglOnly = explode(',', $tgl)[0];
+                  $bulanId = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+                  $bulanEn = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+                  $tglEn = str_replace($bulanId, $bulanEn, $tglOnly);
+                  $formatted = strtotime($tglEn) ? date('d M Y', strtotime($tglEn)) : $tglOnly;
+                @endphp
+                {{ $formatted }}
+              </div>
             </div>
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold {{ $badgeClass }}">
               <i class="bi {{ $icon }}"></i> {{ ucfirst($pesanan->status) }}

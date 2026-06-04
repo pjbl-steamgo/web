@@ -61,7 +61,7 @@
     <div class="px-3 pt-4 pb-1">
       <div class="text-[10px] font-bold text-white/30 uppercase tracking-widest px-2 mb-1">Komunikasi</div>
       <a href="{{ url('/chat') }}" class="sb-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all mb-0.5 {{ request()->is('chat*') ? 'bg-sg-blue text-white' : 'text-white/55 hover:bg-white/[0.07] hover:text-white' }}">
-        <i class="bi bi-chat-dots w-5 text-center text-base flex-shrink-0"></i> Pesan Pelanggan
+        <i class="bi bi-chat-dots w-5 text-center text-base flex-shrink-0"></i> Chat
       </a>
     </div>
   </div> 

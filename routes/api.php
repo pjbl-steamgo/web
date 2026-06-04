@@ -75,6 +75,9 @@ Route::get('/admin/chat/{id_user}', function ($id_user) {
 
 // 2. Kirim Pesan, Reply, dan Kirim Gambar
 Route::post('/admin/chat/{id_user}', function (Request $request, $id_user) {
+    // PERBAIKAN: Buka kembali semua riwayat chat (unresolve) saat admin memulai pembicaraan
+    \App\Models\Chat::where('user_id', $id_user)->update(['is_resolved' => false]);
+
     $data = [
         'user_id'       => $id_user,
         'sender'        => 'admin',

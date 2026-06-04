@@ -16,21 +16,23 @@ class ChatController extends Controller
         // Tandai pesan dari admin sudah dibaca saat pelanggan membuka chat
         Chat::where('user_id', $id_user)->where('sender', 'admin')->update(['is_read' => true]);
 
-        // Cek apakah percakapan sudah di-resolve oleh admin
-        $isResolved = Chat::where('user_id', $id_user)
-            ->where('is_resolved', true)
-            ->exists();
+        // PERBAIKAN: Cek apakah percakapan sudah di-resolve berdasarkan PESAN TERAKHIR saja
+        $latestMessage = $messages->last();
+        $isResolved = $latestMessage ? $latestMessage->is_resolved : false;
 
         return response()->json([
             'success'     => true,
-            'is_resolved' => $isResolved,
-            'data'        => $isResolved ? [] : $messages // kalau resolved, kirim array kosong
+            'is_resolved' => (bool) $isResolved,
+            'data'        => $isResolved ? [] : $messages 
         ], 200);
     }
 
     // Menerima pesan (Teks & Gambar) dari HP Pelanggan
     public function sendMessage(Request $request, $id_user)
     {
+        // PERBAIKAN: Buka kembali semua riwayat chat (unresolve) saat user memulai pembicaraan
+        Chat::where('user_id', $id_user)->update(['is_resolved' => false]);
+
         $data = [
             'user_id'       => $id_user,
             'sender'        => 'user',

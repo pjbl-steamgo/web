@@ -4,28 +4,146 @@
     
     <div class="grid grid-cols-2 md:flex md:flex-wrap gap-3 w-full lg:w-auto">
       
-      <div class="col-span-2 md:col-span-1 relative">
-        <input type="date" id="filter-tanggal" class="w-full bg-white border border-sg-border rounded-xl pl-4 pr-10 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue appearance-none shadow-sm" value="{{ \Carbon\Carbon::now('Asia/Jakarta')->format('Y-m-d') }}" onchange="filterAntrian()">
+      {{-- ============================================================ --}}
+      {{-- FILTER TANGGAL - Custom pill dengan navigasi prev/next hari  --}}
+      {{-- ============================================================ --}}
+      <div class="col-span-2 md:col-span-1 relative flex items-center gap-1 bg-white border border-sg-border rounded-xl shadow-sm px-1 py-[5px]">
+        
+        {{-- Tombol prev hari --}}
+        <button type="button" onclick="shiftTanggal(-1)"
+          class="w-8 h-8 flex items-center justify-center rounded-lg text-sg-sub hover:bg-gray-100 hover:text-sg-text transition-colors flex-shrink-0"
+          title="Hari sebelumnya">
+          <i class="bi bi-chevron-left text-[13px]"></i>
+        </button>
+
+        {{-- Label klik → buka native date picker --}}
+        <button type="button" onclick="document.getElementById('filter-tanggal').showPicker()"
+          class="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors min-w-[130px] justify-center">
+          <i class="bi bi-calendar3 text-[#2563EB] text-[14px]"></i>
+          <span id="label-tanggal" class="text-sm font-semibold text-sg-text whitespace-nowrap"></span>
+        </button>
+
+        {{-- Input date aslinya, disembunyikan tapi tetap bisa showPicker() --}}
+        <input type="date" id="filter-tanggal"
+          class="absolute opacity-0 w-0 h-0 pointer-events-none"
+          value="{{ \Carbon\Carbon::now('Asia/Jakarta')->format('Y-m-d') }}"
+          onchange="onTanggalChange()">
+
+        {{-- Tombol next hari --}}
+        <button type="button" onclick="shiftTanggal(1)"
+          class="w-8 h-8 flex items-center justify-center rounded-lg text-sg-sub hover:bg-gray-100 hover:text-sg-text transition-colors flex-shrink-0"
+          title="Hari berikutnya">
+          <i class="bi bi-chevron-right text-[13px]"></i>
+        </button>
+
       </div>
       
-      <select id="filter-status" class="w-full md:w-auto bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue shadow-sm" onchange="filterAntrian()">
-        <option value="semua">Semua Status</option>
-        <option value="proses">Proses</option>
-        <option value="antri">Menunggu</option>
-      </select>
+      {{-- ============================================================ --}}
+      {{-- FILTER STATUS - Custom dropdown pill                        --}}
+      {{-- ============================================================ --}}
+      <div class="relative" id="wrapper-filter-status">
+        <button type="button"
+          onclick="toggleDropdown('dropdown-status')"
+          class="flex items-center gap-2 bg-white border border-sg-border rounded-xl px-3 py-2 text-sm shadow-sm hover:bg-gray-50 transition-colors w-full md:w-auto"
+          id="btn-filter-status">
+          <i class="bi bi-circle-half text-sg-sub text-[14px]" id="icon-filter-status"></i>
+          <span id="label-filter-status" class="font-semibold text-sg-text whitespace-nowrap">Semua Status</span>
+          <i class="bi bi-chevron-down text-sg-sub text-[11px] ml-1 transition-transform duration-200" id="chevron-filter-status"></i>
+        </button>
+        <div id="dropdown-status"
+          class="hidden absolute left-0 top-[calc(100%+6px)] z-50 bg-white border border-sg-border rounded-xl shadow-lg py-1.5 min-w-[160px]">
+          <button type="button" onclick="setFilter('status','semua','Semua Status','bi-circle-half')"
+            class="filter-option w-full text-left px-4 py-2 text-sm text-sg-text hover:bg-gray-50 flex items-center gap-2.5 font-medium" data-active="true">
+            <i class="bi bi-circle-half text-sg-sub text-[13px]"></i> Semua Status
+          </button>
+          <button type="button" onclick="setFilter('status','proses','Proses','bi-arrow-repeat')"
+            class="filter-option w-full text-left px-4 py-2 text-sm text-sg-text hover:bg-gray-50 flex items-center gap-2.5 font-medium">
+            <i class="bi bi-arrow-repeat text-[#4F46E5] text-[13px]"></i> Proses
+          </button>
+          <button type="button" onclick="setFilter('status','antri','Menunggu','bi-hourglass-split')"
+            class="filter-option w-full text-left px-4 py-2 text-sm text-sg-text hover:bg-gray-50 flex items-center gap-2.5 font-medium">
+            <i class="bi bi-hourglass-split text-[#F97316] text-[13px]"></i> Menunggu
+          </button>
+        </div>
+        {{-- Hidden select untuk filterAntrian() --}}
+        <select id="filter-status" class="hidden" onchange="filterAntrian()">
+          <option value="semua">Semua Status</option>
+          <option value="proses">Proses</option>
+          <option value="antri">Menunggu</option>
+        </select>
+      </div>
 
-      <select id="filter-kategori" class="w-full md:w-auto bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue shadow-sm" onchange="filterAntrian()">
-        <option value="semua">Semua Kategori</option>
-        <option value="mobil">Mobil</option>
-        <option value="motor">Motor</option>
-      </select>
+      {{-- ============================================================ --}}
+      {{-- FILTER KATEGORI - Custom dropdown pill                       --}}
+      {{-- ============================================================ --}}
+      <div class="relative" id="wrapper-filter-kategori">
+        <button type="button"
+          onclick="toggleDropdown('dropdown-kategori')"
+          class="flex items-center gap-2 bg-white border border-sg-border rounded-xl px-3 py-2 text-sm shadow-sm hover:bg-gray-50 transition-colors w-full md:w-auto"
+          id="btn-filter-kategori">
+          <i class="bi bi-car-front text-sg-sub text-[14px]" id="icon-filter-kategori"></i>
+          <span id="label-filter-kategori" class="font-semibold text-sg-text whitespace-nowrap">Semua Kategori</span>
+          <i class="bi bi-chevron-down text-sg-sub text-[11px] ml-1 transition-transform duration-200" id="chevron-filter-kategori"></i>
+        </button>
+        <div id="dropdown-kategori"
+          class="hidden absolute left-0 top-[calc(100%+6px)] z-50 bg-white border border-sg-border rounded-xl shadow-lg py-1.5 min-w-[170px]">
+          <button type="button" onclick="setFilter('kategori','semua','Semua Kategori','bi-car-front')"
+            class="filter-option w-full text-left px-4 py-2 text-sm text-sg-text hover:bg-gray-50 flex items-center gap-2.5 font-medium" data-active="true">
+            <i class="bi bi-car-front text-sg-sub text-[13px]"></i> Semua Kategori
+          </button>
+          <button type="button" onclick="setFilter('kategori','mobil','Mobil','bi-car-front-fill')"
+            class="filter-option w-full text-left px-4 py-2 text-sm text-sg-text hover:bg-gray-50 flex items-center gap-2.5 font-medium">
+            <i class="bi bi-car-front-fill text-[#2563EB] text-[13px]"></i> Mobil
+          </button>
+          <button type="button" onclick="setFilter('kategori','motor','Motor','bi-bicycle')"
+            class="filter-option w-full text-left px-4 py-2 text-sm text-sg-text hover:bg-gray-50 flex items-center gap-2.5 font-medium">
+            <i class="bi bi-bicycle text-[#2563EB] text-[13px]"></i> Motor
+          </button>
+        </div>
+        <select id="filter-kategori" class="hidden" onchange="filterAntrian()">
+          <option value="semua">Semua Kategori</option>
+          <option value="mobil">Mobil</option>
+          <option value="motor">Motor</option>
+        </select>
+      </div>
 
-      <select id="filter-layanan" class="col-span-2 md:col-span-1 w-full md:w-auto bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue shadow-sm truncate max-w-full md:max-w-[200px]" onchange="filterAntrian()">
-        <option value="semua">Semua Layanan</option>
-        @foreach($layanans ?? [] as $layanan)
-          <option value="{{ $layanan->id }}">{{ $layanan->nama_layanan }}</option>
-        @endforeach
-      </select>
+      {{-- ============================================================ --}}
+      {{-- FILTER LAYANAN - Custom dropdown pill                        --}}
+      {{-- Deduplicate by nama_layanan, value = nama (bukan id)        --}}
+      {{-- karena 1 nama layanan bisa ada untuk Mobil & Motor          --}}
+      {{-- ============================================================ --}}
+      @php
+        $namaLayananUnik = collect($layanans ?? [])->pluck('nama_layanan')->unique()->values();
+      @endphp
+      <div class="relative col-span-2 md:col-span-1" id="wrapper-filter-layanan">
+        <button type="button"
+          onclick="toggleDropdown('dropdown-layanan')"
+          class="flex items-center gap-2 bg-white border border-sg-border rounded-xl px-3 py-2 text-sm shadow-sm hover:bg-gray-50 transition-colors w-full md:w-auto"
+          id="btn-filter-layanan">
+          <i class="bi bi-tags text-sg-sub text-[14px]" id="icon-filter-layanan"></i>
+          <span id="label-filter-layanan" class="font-semibold text-sg-text whitespace-nowrap truncate max-w-[160px]">Semua Layanan</span>
+          <i class="bi bi-chevron-down text-sg-sub text-[11px] ml-1 transition-transform duration-200" id="chevron-filter-layanan"></i>
+        </button>
+        <div id="dropdown-layanan"
+          class="hidden absolute left-0 top-[calc(100%+6px)] z-50 bg-white border border-sg-border rounded-xl shadow-lg py-1.5 min-w-[200px] max-h-[240px] overflow-y-auto">
+          <button type="button" onclick="setFilter('layanan','semua','Semua Layanan','bi-tags')"
+            class="filter-option w-full text-left px-4 py-2 text-sm text-sg-text hover:bg-gray-50 flex items-center gap-2.5 font-medium" data-active="true">
+            <i class="bi bi-tags text-sg-sub text-[13px]"></i> Semua Layanan
+          </button>
+          @foreach($namaLayananUnik as $namaLayanan)
+            <button type="button" onclick="setFilter('layanan','{{ $namaLayanan }}','{{ $namaLayanan }}','bi-droplet-fill')"
+              class="filter-option w-full text-left px-4 py-2 text-sm text-sg-text hover:bg-gray-50 flex items-center gap-2.5 font-medium">
+              <i class="bi bi-droplet-fill text-[#2563EB] text-[13px]"></i> {{ $namaLayanan }}
+            </button>
+          @endforeach
+        </div>
+        <select id="filter-layanan" class="hidden" onchange="filterAntrian()">
+          <option value="semua">Semua Layanan</option>
+          @foreach($namaLayananUnik as $namaLayanan)
+            <option value="{{ $namaLayanan }}">{{ $namaLayanan }}</option>
+          @endforeach
+        </select>
+      </div>
 
     </div>
     
@@ -62,47 +180,58 @@
                   $status = strtolower($antrian->status ?? '');
                   $isProses = $status === 'proses';
                   $kategori = strtolower($antrian->layanan->kategori ?? '');
-                  $layananId = $antrian->layanan_id ?? '';
+                  $namaLayanan = $antrian->layanan->nama_layanan ?? '';
                   
                   $rawTanggal = trim($antrian->tanggal ?? '');
                   $tanggalOnly = \Carbon\Carbon::now('Asia/Jakarta')->format('Y-m-d');
                   $jamOnly = '00:00';
 
-                  // PERBAIKAN 3: Menggunakan Regex (Pendeteksi Pola Teks) agar 100% Kebal Error
-                  // Mendeteksi pola "02 Juni 2026, 16:00..."
-                  $pattern = '/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4}),\s+(\d{2}:\d{2})/';
-                  
-                  if (preg_match($pattern, $rawTanggal, $matches)) {
-                      $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
-                      $monthIndo = strtolower($matches[2]);
-                      $year = $matches[3];
-                      $jamOnly = $matches[4];
-
-                      // Kamus translasi bulan bahasa Indonesia -> Angka
-                      $months = [
-                          'januari' => '01', 'februari' => '02', 'maret' => '03', 
-                          'april' => '04', 'mei' => '05', 'juni' => '06', 
-                          'juli' => '07', 'agustus' => '08', 'september' => '09', 
-                          'oktober' => '10', 'november' => '11', 'desember' => '12'
-                      ];
-                      $monthNum = $months[$monthIndo] ?? '01';
+                  if (!empty($rawTanggal)) {
+                      // Normalisasi nama bulan agar dikenali oleh Carbon secara universal
+                      $idMonths = ['januari', 'februari', 'maret', 'mei', 'juni', 'juli', 'agustus', 'oktober', 'desember'];
+                      $enMonths = ['january', 'february', 'march', 'may', 'june', 'july', 'august', 'october', 'december'];
+                      $normalizedTanggal = str_ireplace($idMonths, $enMonths, $rawTanggal);
                       
-                      // Hasilnya pasti murni format '2026-06-02'
-                      $tanggalOnly = "$year-$monthNum-$day";
-                  } else {
-                      // Fallback: Jika database ternyata menyimpan format Date() standar
                       try {
-                          $parsed = \Carbon\Carbon::parse($rawTanggal);
+                          $parsed = \Carbon\Carbon::parse($normalizedTanggal)->timezone('Asia/Jakarta');
                           $tanggalOnly = $parsed->format('Y-m-d');
                           $jamOnly = $parsed->format('H:i');
-                      } catch (\Exception $e) {}
+                      } catch (\Exception $e) {
+                          // Fallback jika parsing tetap gagal
+                          $pattern = '/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/';
+                          if (preg_match($pattern, $rawTanggal, $matches)) {
+                              $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+                              $monthStr = strtolower($matches[2]);
+                              $year = $matches[3];
+                              $months = [
+                                  'januari' => '01', 'jan' => '01', 'january' => '01',
+                                  'februari' => '02', 'feb' => '02', 'february' => '02',
+                                  'maret' => '03', 'mar' => '03', 'march' => '03',
+                                  'april' => '04', 'apr' => '04',
+                                  'mei' => '05', 'may' => '05',
+                                  'juni' => '06', 'jun' => '06', 'june' => '06',
+                                  'juli' => '07', 'jul' => '07', 'july' => '07',
+                                  'agustus' => '08', 'agu' => '08', 'aug' => '08', 'august' => '08',
+                                  'september' => '09', 'sep' => '09',
+                                  'oktober' => '10', 'okt' => '10', 'oct' => '10', 'october' => '10',
+                                  'november' => '11', 'nov' => '11',
+                                  'desember' => '12', 'des' => '12', 'dec' => '12', 'december' => '12'
+                              ];
+                              $monthNum = $months[$monthStr] ?? '01';
+                              $tanggalOnly = "$year-$monthNum-$day";
+                              
+                              if (preg_match('/(\d{2}:\d{2})/', $rawTanggal, $timeMatches)) {
+                                  $jamOnly = $timeMatches[1];
+                              }
+                          }
+                      }
                   }
               @endphp
               
               <tr class="hover:bg-gray-50 transition-colors antrian-row-desktop" 
                   data-status="{{ $status }}" 
                   data-kategori="{{ $kategori }}" 
-                  data-layanan="{{ $layananId }}" 
+                  data-layanan="{{ $namaLayanan }}" 
                   data-tanggal="{{ $tanggalOnly }}">
                 
                 <td class="px-6 py-4 whitespace-nowrap">
@@ -169,41 +298,56 @@
               $status = strtolower($antrian->status ?? '');
               $isProses = $status === 'proses';
               $kategori = strtolower($antrian->layanan->kategori ?? '');
-              $layananId = $antrian->layanan_id ?? '';
+              $namaLayanan = $antrian->layanan->nama_layanan ?? '';
               
               $rawTanggal = trim($antrian->tanggal ?? '');
               $tanggalOnly = \Carbon\Carbon::now('Asia/Jakarta')->format('Y-m-d');
               $jamOnly = '00:00';
 
-              // LOGIKA REGEX SAMA DENGAN DESKTOP
-              $pattern = '/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4}),\s+(\d{2}:\d{2})/';
-              if (preg_match($pattern, $rawTanggal, $matches)) {
-                  $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
-                  $monthIndo = strtolower($matches[2]);
-                  $year = $matches[3];
-                  $jamOnly = $matches[4];
-
-                  $months = [
-                      'januari' => '01', 'februari' => '02', 'maret' => '03', 
-                      'april' => '04', 'mei' => '05', 'juni' => '06', 
-                      'juli' => '07', 'agustus' => '08', 'september' => '09', 
-                      'oktober' => '10', 'november' => '11', 'desember' => '12'
-                  ];
-                  $monthNum = $months[$monthIndo] ?? '01';
-                  $tanggalOnly = "$year-$monthNum-$day";
-              } else {
+              if (!empty($rawTanggal)) {
+                  $idMonths = ['januari', 'februari', 'maret', 'mei', 'juni', 'juli', 'agustus', 'oktober', 'desember'];
+                  $enMonths = ['january', 'february', 'march', 'may', 'june', 'july', 'august', 'october', 'december'];
+                  $normalizedTanggal = str_ireplace($idMonths, $enMonths, $rawTanggal);
+                  
                   try {
-                      $parsed = \Carbon\Carbon::parse($rawTanggal);
+                      $parsed = \Carbon\Carbon::parse($normalizedTanggal)->timezone('Asia/Jakarta');
                       $tanggalOnly = $parsed->format('Y-m-d');
                       $jamOnly = $parsed->format('H:i');
-                  } catch (\Exception $e) {}
+                  } catch (\Exception $e) {
+                      $pattern = '/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/';
+                      if (preg_match($pattern, $rawTanggal, $matches)) {
+                          $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+                          $monthStr = strtolower($matches[2]);
+                          $year = $matches[3];
+                          $months = [
+                              'januari' => '01', 'jan' => '01', 'january' => '01',
+                              'februari' => '02', 'feb' => '02', 'february' => '02',
+                              'maret' => '03', 'mar' => '03', 'march' => '03',
+                              'april' => '04', 'apr' => '04',
+                              'mei' => '05', 'may' => '05',
+                              'juni' => '06', 'jun' => '06', 'june' => '06',
+                              'juli' => '07', 'jul' => '07', 'july' => '07',
+                              'agustus' => '08', 'agu' => '08', 'aug' => '08', 'august' => '08',
+                              'september' => '09', 'sep' => '09',
+                              'oktober' => '10', 'okt' => '10', 'oct' => '10', 'october' => '10',
+                              'november' => '11', 'nov' => '11',
+                              'desember' => '12', 'des' => '12', 'dec' => '12', 'december' => '12'
+                          ];
+                          $monthNum = $months[$monthStr] ?? '01';
+                          $tanggalOnly = "$year-$monthNum-$day";
+                          
+                          if (preg_match('/(\d{2}:\d{2})/', $rawTanggal, $timeMatches)) {
+                              $jamOnly = $timeMatches[1];
+                          }
+                      }
+                  }
               }
           @endphp
           
           <div class="p-4 bg-white antrian-row-mobile"
                data-status="{{ $status }}" 
                data-kategori="{{ $kategori }}" 
-               data-layanan="{{ $layananId }}" 
+               data-layanan="{{ $namaLayanan }}" 
                data-tanggal="{{ $tanggalOnly }}">
             
             <div class="flex justify-between items-start mb-3">
@@ -314,6 +458,7 @@
     </div>
   </div>
 
+  {{-- Modal Toggle Jam Individu --}}
   <div id="modal-toggle-jam" class="modal-panel hidden fixed z-[2001] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-full max-w-sm bg-white rounded-2xl shadow-2xl mx-auto">
     <div class="p-6 text-center">
       <div id="toggle-jam-icon-container" class="w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 bg-orange-100 text-orange-600">
@@ -330,6 +475,7 @@
     </div>
   </div>
 
+  {{-- Modal Toggle Semua Jam --}}
   <div id="modal-toggle-semua-jam" class="modal-panel hidden fixed z-[2001] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-full max-w-sm bg-white rounded-2xl shadow-2xl mx-auto">
     <div class="p-6 text-center">
       <div id="toggle-semua-icon-container" class="w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 bg-orange-100 text-orange-600">
@@ -349,6 +495,143 @@
 </div>
 
 <script>
+
+  // ============================================================
+  // FILTER TANGGAL — Helper functions untuk custom date pill
+  // ============================================================
+
+  function formatLabelTanggal(dateStr) {
+    // dateStr format: 'YYYY-MM-DD'
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+    const [year, month, day] = dateStr.split('-');
+    const bulanSingkat = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    const labelTanggal = `${parseInt(day)} ${bulanSingkat[parseInt(month) - 1]} ${year}`;
+
+    if (dateStr === todayStr)     return `Hari Ini, ${parseInt(day)} ${bulanSingkat[parseInt(month) - 1]}`;
+    if (dateStr === yesterdayStr) return `Kemarin, ${parseInt(day)} ${bulanSingkat[parseInt(month) - 1]}`;
+    if (dateStr === tomorrowStr)  return `Besok, ${parseInt(day)} ${bulanSingkat[parseInt(month) - 1]}`;
+    return labelTanggal;
+  }
+
+  function onTanggalChange() {
+    const val = document.getElementById('filter-tanggal').value;
+
+    // Update label pill
+    document.getElementById('label-tanggal').innerText = formatLabelTanggal(val);
+
+    // Update teks header "Antrian Aktif — ..."
+    const [year, month, day] = val.split('-');
+    const bulanPanjang = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    document.getElementById('display-tanggal').innerText = `${parseInt(day)} ${bulanPanjang[parseInt(month) - 1]} ${year}`;
+
+    filterAntrian();
+  }
+
+  function shiftTanggal(delta) {
+    const input = document.getElementById('filter-tanggal');
+    const current = new Date(input.value);
+    current.setDate(current.getDate() + delta);
+    // Format manual agar tidak kena timezone offset
+    const y = current.getFullYear();
+    const m = String(current.getMonth() + 1).padStart(2, '0');
+    const d = String(current.getDate()).padStart(2, '0');
+    input.value = `${y}-${m}-${d}`;
+    onTanggalChange();
+  }
+
+  // ============================================================
+  // CUSTOM DROPDOWN FILTER
+  // ============================================================
+
+  function toggleDropdown(id) {
+    const all = ['dropdown-status', 'dropdown-kategori', 'dropdown-layanan'];
+    all.forEach(ddId => {
+      const dd = document.getElementById(ddId);
+      const key = ddId.replace('dropdown-', '');
+      const chevron = document.getElementById('chevron-filter-' + key);
+      if (ddId === id) {
+        const isHidden = dd.classList.contains('hidden');
+        dd.classList.toggle('hidden', !isHidden);
+        if (chevron) chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+      } else {
+        dd.classList.add('hidden');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      }
+    });
+  }
+
+  // Tutup semua dropdown kalau klik di luar
+  document.addEventListener('click', function(e) {
+    const wrappers = ['wrapper-filter-status', 'wrapper-filter-kategori', 'wrapper-filter-layanan'];
+    const clickedInside = wrappers.some(id => {
+      const el = document.getElementById(id);
+      return el && el.contains(e.target);
+    });
+    if (!clickedInside) {
+      ['dropdown-status', 'dropdown-kategori', 'dropdown-layanan'].forEach(ddId => {
+        document.getElementById(ddId)?.classList.add('hidden');
+        const key = ddId.replace('dropdown-', '');
+        const chevron = document.getElementById('chevron-filter-' + key);
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      });
+    }
+  });
+
+  function setFilter(key, value, label, icon) {
+    // Update label & icon pill
+    document.getElementById('label-filter-' + key).innerText = label;
+    document.getElementById('icon-filter-' + key).className = icon + ' text-[14px] ' + (value === 'semua' ? 'text-sg-sub' : 'text-[#2563EB]');
+
+    // Highlight border pill kalau ada filter aktif
+    const btn = document.getElementById('btn-filter-' + key);
+    if (value === 'semua') {
+      btn.classList.remove('border-[#2563EB]', 'bg-[#EFF6FF]');
+      btn.classList.add('border-sg-border', 'bg-white');
+    } else {
+      btn.classList.remove('border-sg-border', 'bg-white');
+      btn.classList.add('border-[#2563EB]', 'bg-[#EFF6FF]');
+    }
+
+    // Sync ke hidden select asli lalu trigger filterAntrian
+    const select = document.getElementById('filter-' + key);
+    select.value = value;
+    select.dispatchEvent(new Event('change'));
+
+    // Tandai active state di option list
+    const dropdown = document.getElementById('dropdown-' + key);
+    dropdown.querySelectorAll('.filter-option').forEach(opt => {
+      opt.removeAttribute('data-active');
+      opt.classList.remove('bg-[#EFF6FF]', 'text-[#2563EB]', 'font-bold');
+    });
+    // Highlight item yang dipilih
+    const allOpts = dropdown.querySelectorAll('.filter-option');
+    allOpts.forEach(opt => {
+      if (opt.getAttribute('onclick')?.includes(`'${value}'`)) {
+        opt.setAttribute('data-active', 'true');
+        opt.classList.add('bg-[#EFF6FF]', 'text-[#2563EB]', 'font-bold');
+      }
+    });
+
+    // Tutup dropdown
+    dropdown.classList.add('hidden');
+    const chevron = document.getElementById('chevron-filter-' + key);
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+  }
+
+  // ============================================================
+  // FILTER ANTRIAN
+  // ============================================================
+
   function filterAntrian() {
     const valTanggal = document.getElementById('filter-tanggal').value;
     const valStatus = document.getElementById('filter-status').value;
@@ -400,6 +683,10 @@
       }
     }
   }
+
+  // ============================================================
+  // JAM OPERASIONAL — Toggle state helpers
+  // ============================================================
 
   function setJamIndividuState(btn, targetStatus) {
     const icon = btn.querySelector('i');
@@ -592,8 +879,14 @@
     closeModal();
   }
 
-  // Inisialisasi awal
+  // ============================================================
+  // INISIALISASI AWAL
+  // ============================================================
   document.addEventListener('DOMContentLoaded', function() {
+    // Inisialisasi label tanggal pada custom pill
+    const val = document.getElementById('filter-tanggal').value;
+    document.getElementById('label-tanggal').innerText = formatLabelTanggal(val);
+
     filterAntrian();
   });
 </script>

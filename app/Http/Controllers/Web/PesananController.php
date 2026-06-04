@@ -16,39 +16,35 @@ class PesananController extends Controller
         $pesanans = Pesanan::with('layanan')->orderBy('created_at', 'desc')->get();
         
         return view('index', [
-            'initPage' => 'pesanan', // Pastikan nama ini sesuai dengan di file index.blade.php
+            'initPage' => 'pesanan',
             'pesanans' => $pesanans
         ]);
     }
 
-    /**
-     * MENAMPILKAN HALAMAN KONFIRMASI BOOKING (Hanya status Belum Dikonfirmasi)
-     */
     public function halamanBooking()
     {
-        $pesanans = Pesanan::with('layanan')
+        // Tambahkan 'user' pada array with()
+        $pesanans = Pesanan::with(['layanan', 'user']) 
             ->where('status', 'Belum Dikonfirmasi')
             ->orderBy('created_at', 'desc')
             ->get();
             
         return view('index', [
-            'initPage' => 'konfirmasi-booking', // KUNCI PEMISAH: Hanya memanggil komponen booking
+            'initPage' => 'konfirmasi-booking', 
             'pesanans' => $pesanans
         ]);
     }
 
-    /**
-     * MENAMPILKAN HALAMAN KONFIRMASI PEMBAYARAN (Hanya status Sedang Diverifikasi)
-     */
     public function halamanPembayaran()
     {
-        $pesanans = Pesanan::with('layanan')
+        // Tambahkan 'user' pada array with()
+        $pesanans = Pesanan::with(['layanan', 'user'])
             ->where('status', 'Sedang Diverifikasi')
             ->orderBy('created_at', 'desc')
             ->get();
             
         return view('index', [
-            'initPage' => 'konfirmasi-pembayaran', // KUNCI PEMISAH: Hanya memanggil komponen pembayaran
+            'initPage' => 'konfirmasi-pembayaran', 
             'pesanans' => $pesanans
         ]);
     }

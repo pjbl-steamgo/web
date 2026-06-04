@@ -76,12 +76,7 @@
     </div>
   @endif
 
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-    <div>
-      <h2 class="text-xl font-display font-bold text-sg-text">Kelola Layanan</h2>
-      <p class="text-sm text-sg-sub mt-1">Kelola harga, jadwal, dan pantau statistik pesanan bulan ini.</p>
-    </div>
-    
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">   
     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
       <div class="relative flex-grow sm:flex-grow-0">
         <input type="text" id="layanan-search" class="w-full sm:w-64 bg-white border border-sg-border rounded-xl px-4 py-2.5 text-sm text-sg-text focus:outline-none focus:border-sg-blue shadow-sm" placeholder="🔍 Cari nama layanan..." oninput="searchLayanan()">

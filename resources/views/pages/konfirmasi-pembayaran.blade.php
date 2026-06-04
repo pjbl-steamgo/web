@@ -28,9 +28,13 @@
 
                 <div class="p-6 md:p-8 flex flex-col flex-grow">
                     <div class="flex items-center space-x-4 mb-8">
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-[#3B5BDB] font-bold text-xl flex-shrink-0">
-                            {{ strtoupper(substr($pesanan->nama_pelanggan ?? 'U', 0, 1)) }}
-                        </div>
+                        @if(isset($pesanan->user) && $pesanan->user->foto_profil)
+                            <img src="{{ asset('storage/' . $pesanan->user->foto_profil) }}" alt="Foto Profil" class="w-12 h-12 rounded-full object-cover flex-shrink-0 border border-gray-200 shadow-sm">
+                        @else
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-[#3B5BDB] font-bold text-xl flex-shrink-0">
+                                {{ strtoupper(substr($pesanan->nama_pelanggan ?? 'U', 0, 1)) }}
+                            </div>
+                        @endif
                         <div>
                             <p class="text-[12px] font-bold text-sg-sub uppercase tracking-wider">Kode Pesanan</p>
                             <p class="text-lg font-bold text-sg-text">{{ $pesanan->kode_pesanan ?? '-' }}</p>

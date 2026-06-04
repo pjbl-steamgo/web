@@ -27,4 +27,11 @@ class Pesanan extends Model
     {
         return $this->belongsTo(Layanan::class, 'layanan_id');
     }
+
+    // PERBAIKAN: Relasi untuk mengambil data user (pelanggan) 
+    // Menghubungkan 'user_id' di pesanan dengan 'id_user' di tabel users
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id_user');
+    }
 }
