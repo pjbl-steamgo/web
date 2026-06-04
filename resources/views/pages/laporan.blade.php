@@ -56,13 +56,21 @@
 
   <script>
     function exportCSV() {
-        // Mengarahkan ke rute export CSV
-        window.location.href = "{{ route('laporan.exportCsv') }}";
+        // Ambil periode dari URL saat ini
+        const urlParams = new URLSearchParams(window.location.search);
+        const periode = urlParams.get('periode') || 'bulan';
+        
+        // Mengarahkan ke rute export CSV beserta parameternya
+        window.location.href = "{{ route('laporan.exportCsv') }}?periode=" + periode;
     }
 
     function exportPDF() {
-        // Mengarahkan ke rute export PDF
-        window.location.href = "{{ route('laporan.exportPdf') }}";
+        // Ambil periode dari URL saat ini
+        const urlParams = new URLSearchParams(window.location.search);
+        const periode = urlParams.get('periode') || 'bulan';
+
+        // Mengarahkan ke rute export PDF beserta parameternya
+        window.location.href = "{{ route('laporan.exportPdf') }}?periode=" + periode;
     }
 
     function selPeriod(btn) {
